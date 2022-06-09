@@ -16,8 +16,7 @@
 - Configure Laravel to use your MySQL database via settings in .env 
 - Using Laravel's Artisan command migrate db to your environment (php artisan migrate).
 - Using Laravel's Artisan command seed the database (php artisan db:seed).
-- Using a browser navigate to '/calendar/public/'
-- You should now see a calendar
+- You should now see a calendar at '/calendar/public/'
 
 
 
