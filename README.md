@@ -1,9 +1,10 @@
-## Used Cars NI Programming Task Pricing
+## Calendar
 
 
 ### Technologies
 
 - Laravel 9.x
+- Full Calendar
 - jQuery 3
 - Boostrap 5
 
@@ -11,36 +12,75 @@
 ### Setup
 
 - Download or clone the repository from github.
-- Create a new database in your MySQL environment (eg. usedcarsni).
-- Configure Laravel to use your MySQL database via settings in .env (database,username,password).
+- Create a new database in your MySQL environment (eg. calendar).
+- Configure Laravel to use your MySQL database via settings in .env 
 - Using Laravel's Artisan command migrate db to your environment (php artisan migrate).
 - Using Laravel's Artisan command seed the database (php artisan db:seed).
-- Using a browser navigate to '/localhost/usedcarsni/public/'
-- The coloured buttons will load the appropriate JSON file from the public folder and send request.
-- The API will return a JSON response of the calulated price which will display on the page.
-
-
-### Assumptions made
-
-Rule 5 Below: I assumed that where rule 5 was concerned the 'last_listed' date used to check if listing is within 30 days of expiry should be taken from storage and not from the request as the request should be compared against a listing that already exists. 
+- Using a browser navigate to '/calendar/public/'
+- You should now see a calendar
 
 
 
-    1. A request in the format of the samples supplied would be made to the API (e.g. /api/calculate)
-    2. If the vehicle to be listed is valued at under £1000, the listing is completely free.
-    3. If the vehicle is valued between £1000 and £5000, the listing is £7.99
-    4. If the vehicle is valued over £5000, the listing is £14.99
-    5. If the same vehicle is being listed by the same customer within 30 days of the listing expiring, they receive a 15% discount on the new listing.
-    6. If a different vehicle is listed by the same customer at any time, the listing price is standard.
-    7. The system should reject any invalid requests with an appropriate error code and message.
 
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-### Limitations
-- No PHPUnit tests are present. This is due to my lack of knowlege in this area. 
-- I ran tests from the front end with JavaScript loading in JSON files and then sending request.
-- I used test driven development as much as possible however I do realise the fundamental importance of learning PHPUnit to properly implement a test driven approach. 
-- I did not use authentication in the requests.
+<p align="center">
+<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-### Learning
-- Learned how to use Laravel migrations.
-- Learned how to populate the database using Laravel db:seed
+## About Laravel
+
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
+
+## Learning Laravel
+
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+
+## Laravel Sponsors
+
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+
+### Premium Partners
+
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Cubet Techno Labs](https://cubettech.com)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[Many](https://www.many.co.uk)**
+- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
+- **[DevSquad](https://devsquad.com)**
+- **[Curotec](https://www.curotec.com/)**
+- **[OP.GG](https://op.gg)**
+
+## Contributing
+
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
