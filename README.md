@@ -1,7 +1,7 @@
 ## Calendar
 
 
-### Technologies
+## Technologies
 
 - Laravel 9.x
 - Full Calendar
@@ -9,7 +9,7 @@
 - Boostrap 5
 
 
-### Setup
+## Setup
 
 - Download or clone the repository from github.
 - Create a new database in your MySQL environment (eg. calendar).
