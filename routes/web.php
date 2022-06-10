@@ -21,7 +21,7 @@ use App\Http\Controllers\EventController;
 
 
 Route::get('/', function () {
-    return view('front_jquery');
+    return view('front_test');
 });
 
 

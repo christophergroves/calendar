@@ -54,9 +54,9 @@
 
 
     <script>
-
             let request = {};
             request.url = 'api/store';
+            request.type = 'PUT';
             request.data = {
                 "requestId": 85261523,
                 "customerId": 256945,
@@ -65,6 +65,7 @@
                     "value": 11294,
                     "last_listed": null
                  }
+            request.data = JSON.stringify(request.data);
             };
 
 
@@ -78,12 +79,11 @@
 
         // send Json ajax request to api/calculate and display result if successful, else show error
         function sendRequest(data,url){
-            $("#request").html(JSON.stringify(request.data));
+            $("#request").html(request.data);
             $.ajax({
                 url: request.url,
-                type: 'PUT',
-                data: JSON.stringify(request.data),
-                // data: data,
+                type: request.type,
+                data: request.data,
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'JSON',
                 // processData: false,
