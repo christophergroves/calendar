@@ -34,7 +34,10 @@
 
     <div style='margin-top: 20px;'>
 
-        <button type="button" id="1" class="btn btn-outline-primary">Send Request</button>
+        <button type="button" id="GET" httpType="GET" class="btn btn-outline-primary">Index (GET)</button>
+        <button type="button" id="PUT" httpType="PUT" class="btn btn-outline-secondary">Store (PUT)</button>
+
+
     
     </div>
 
@@ -55,8 +58,16 @@
 
     <script>
             let request = {};
-            request.url = 'api/store';
-            request.type = 'PUT';
+            request.type = {
+                "GET":{
+                    "url":"api",
+                    "stringify":false,
+                },
+                "PUT":{
+                    "url":"api/store",
+                    "stringify":true,
+                }};
+
             request.data = {
                 "requestId": 85261523,
                 "customerId": 256945,
@@ -64,26 +75,25 @@
                     "id": 9763928242,
                     "value": 11294,
                     "last_listed": null
-                 }
-            request.data = JSON.stringify(request.data);
-            };
+                 }};
+
 
 
         // When document is ready listen for button click. If button clicked use button id attribute
         // in file path to pick the correct file
         $(document).ready(function(){
             $.ajaxSetup({ cache: false });
-            $(".btn").click(function(){sendRequest(request);}); 
+            $(".btn").click(function(){sendRequest(request,$(this).attr('httpType'));}); 
         });
 
 
         // send Json ajax request to api/calculate and display result if successful, else show error
-        function sendRequest(data,url){
+        function sendRequest(request,httpType){
             $("#request").html(request.data);
             $.ajax({
-                url: request.url,
-                type: request.type,
-                data: request.data,
+                url: request.type[httpType].url,
+                type: httpType,
+                data: request.type[httpType].stringify ? JSON.stringify(request.data) : request.data,
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'JSON',
                 // processData: false,
