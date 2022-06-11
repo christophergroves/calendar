@@ -3,7 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\EventController;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\VenueController;
+
 
 
 /*
@@ -22,7 +25,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::put('/store', [EventController::class, 'store']);
+Route::put('/store', [ActivityController::class, 'store']);
+
+
+Route::get('/', [ActivityController::class, 'index']);
+
 
 
 // Route::resource('/', CalculatePriceController::class);

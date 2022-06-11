@@ -16,7 +16,7 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        //
+        return 'index method of activity controller';
     }
 
     /**
@@ -37,7 +37,7 @@ class ActivityController extends Controller
      */
     public function store(StoreActivityRequest $request)
     {
-        //
+        return $request;
     }
 
     /**
