@@ -11,7 +11,10 @@
 <script type="text/javascript" src="{!! asset('assets/js/select2-3.5.1/select2.min.js') !!}"></script>
 <link rel="stylesheet" href="{!! asset('assets/js/select2-3.5.1/select2.css') !!}">
 
-
 <!--============================ Bootstrap Dialog =========================================-->
-<link rel="stylesheet" type="text/css" href="{!! asset('assets/js/bootstrap3-dialog-1.35.4/dist/css/bootstrap-dialog.css') !!}"/>
 <script type="text/javascript" src="{!! asset('assets/js/bootstrap3-dialog-1.35.4/dist/js/bootstrap-dialog.min.js') !!}"></script>
+<link rel="stylesheet" type="text/css" href="{!! asset('assets/js/bootstrap3-dialog-1.35.4/dist/css/bootstrap-dialog.css') !!}"/>
+
+<!--============================ Common JS & CSS =========================================-->
+<script type="text/javascript" src="{!! asset('assets/js/common/common.js') !!}"></script>
+<link rel="stylesheet" type="text/css" href="{!! asset('assets/css/main.css?v=4') !!}"/>

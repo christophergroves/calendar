@@ -12,5 +12,5 @@
 <script type="text/javascript" src="{!! asset('assets/js/jquery.qtip/jquery.qtip.min.js') !!}"></script>
 
 <!--============================ General Site js and css =========================================-->
-<script type="text/javascript" src="{!! asset('assets/js/common/name_search.js?v=1.2') !!}"></script>
-<script type="text/javascript" src="{!! asset('assets/js/common/calendar.js?v=1.8') !!}"></script>
+<script type="text/javascript" src="{!! asset('assets/js/common/name_search.js') !!}"></script>
+<script type="text/javascript" src="{!! asset('assets/js/common/calendar.js') !!}"></script>
