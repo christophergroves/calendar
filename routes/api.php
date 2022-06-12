@@ -28,7 +28,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::put('/store', [ActivityController::class, 'store']);
 
 
-Route::get('/', [ActivityController::class, 'index']);
+// Route::get('/', [ActivityController::class, 'index']);
+
+
+Route::get('/session/index', [SessionController::class, 'index']);
+
 
 
 

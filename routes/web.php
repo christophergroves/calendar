@@ -21,7 +21,16 @@ use App\Http\Controllers\EventController;
 
 
 Route::get('/', function () {
-    return view('front_test');
+    return view('main.front_test');
+});
+
+
+
+
+Route::get('/calendar', function () {
+    return view('main.calendar')
+    ->with('service_user_id',1)
+    ->with('fp',1);
 });
 
 

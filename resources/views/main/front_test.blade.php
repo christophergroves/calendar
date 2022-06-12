@@ -60,7 +60,7 @@
             let request = {};
             request.type = {
                 "GET":{
-                    "url":"api",
+                    "url":"api/session/index",
                     "stringify":false,
                 },
                 "PUT":{
