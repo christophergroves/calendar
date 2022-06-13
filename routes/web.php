@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\TestCodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +26,6 @@ Route::get('/', function () {
 });
 
 
-
-
 Route::get('/calendar', function () {
     return view('main.calendar')
     ->with('service_user_id',1)
@@ -34,5 +33,4 @@ Route::get('/calendar', function () {
 });
 
 
-
-
+Route::get('/test', [TestCodeController::class, 'test']);

@@ -1,19 +1,8 @@
 body{
 	background-color: #F1F1F1;
 	background: url('https://ims-cedar.org/2/assets/images/bg-body4.png') repeat;
-
-
-	/*background: url('https://ims-cedar.org/2/assets/images/bg-grey-dimpled_2.jpg') repeat;*/
-
 }
-html,body {
-	height: 100%;
 
-	/*min-width: 100%;*/
-	/*min-width: 520px;*/
-	/*overflow-y:scroll;*/
-	/* The html and body elements cannot have any padding or margin. */
-}
 
 /*===================== overall  layout =================>*/
 h1,h2,h3,h4,h5,h6 {
@@ -24,6 +13,9 @@ h1,h2,h3,h4,h5,h6 {
 p{
 	margin:1px;
 }
+
+
+
 
 
 
@@ -93,11 +85,6 @@ p{
 	margin:0;
 }
 
-
-
-	.container{
-		/*width:1155px !important;*/
-	}
 
 /* =====Wrapper for page content to push down footer =====>*/
 .content-wrapper {
@@ -785,10 +772,9 @@ hr.hr_form_break{
 	background-color: white;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
 	border: 1px solid rgba(0, 0, 0, 0.10);
-	padding-bottom:15px;
 	border-radius: 5px;
-	padding-top:14px;
-	margin-bottom:40px;
+	margin-bottom:50px;
+	margin-top: 50px;
 }
 
 .view-heading{

@@ -13,25 +13,14 @@ class CreateVenuesTable extends Migration
      */
     public function up()
     {
+
         Schema::create('venues', function (Blueprint $table) {
             $table->id();
-
-
-           
-
-
-
-
-
-
-
-
-
-            $table->unsignedBigInteger('vehicle_id')->nullable();
-            $table->decimal('value', $precision = 8, $scale = 2)->nullable();
-            $table->date('last_listed')->nullable();
+            $table->string('name');
+            $table->unsignedBigInteger('updated_by');
             $table->timestamps();
         });
+
     }
 
     /**

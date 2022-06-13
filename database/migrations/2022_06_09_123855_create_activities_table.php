@@ -20,7 +20,6 @@ class CreateActivitiesTable extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class);
-            $table->foreignIdFor(Activity::class);
             $table->foreignIdFor(ActivityType::class);
             $table->text('description');
             $table->unsignedBigInteger('updated_by')->nullable();

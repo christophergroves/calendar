@@ -14,7 +14,9 @@ class VenueFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->city(),
+            'updated_by' => $this->faker->numerify('###')
         ];
+     
     }
 }

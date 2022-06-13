@@ -11,10 +11,10 @@
 		<div class="content-wrapper">
 			
 			<div class="container">
-						
+
 						<div class="well">
 
-							<h1>CALEDAR VIEW</h1>
+							{{-- <h1>CALEDAR</h1> --}}
 
 							@yield('section_1')
 
