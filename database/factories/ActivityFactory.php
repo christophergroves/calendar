@@ -18,7 +18,6 @@ class ActivityFactory extends Factory
         $activity_type = ActivityType::inRandomOrder()->first();
         $venue = Venue::inRandomOrder()->first();
 
-
         return [
             'description' => $this->faker->text(10),
             'updated_by' => $this->faker->numerify('###'),

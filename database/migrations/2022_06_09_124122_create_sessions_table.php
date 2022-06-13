@@ -18,7 +18,7 @@ class CreateSessionsTable extends Migration
     
             $table->id();
             $table->foreignIdFor(Activity::class);
-            $table->unsignedBigInteger('parent_id');
+            $table->unsignedBigInteger('parent_id')->nullable();
 
             $table->unsignedInteger('session_day');
             $table->time('start_time');
@@ -28,8 +28,8 @@ class CreateSessionsTable extends Migration
             $table->tinyInteger('ends_on');
             $table->tinyInteger('recurrance_type');
             $table->tinyInteger('recurrance_interval');
-            $table->tinyInteger('recurrance_monthly_interval');
-            $table->unsignedInteger('hours');
+            $table->tinyInteger('recurrance_monthly_interval')->nullable();
+            $table->unsignedInteger('hours')->nullable();
 
             $table->unsignedBigInteger('updated_by');
             $table->timestamps();

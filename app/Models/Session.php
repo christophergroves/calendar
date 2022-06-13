@@ -8,4 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class Session extends Model
 {
     use HasFactory;
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Belongs to activity.
+     */
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class);
+    }
 }

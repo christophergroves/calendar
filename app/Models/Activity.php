@@ -20,6 +20,15 @@ class Activity extends Model
     }
 
 
+    /**
+     * Get the sessions for this activity.
+     */
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
+    }
+
+
 
 
 }
