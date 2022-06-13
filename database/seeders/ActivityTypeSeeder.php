@@ -23,7 +23,7 @@ class ActivityTypeSeeder extends Seeder
             ['name' => 'Planning & Support','category' => 'ProgPlanning', 'list_position' => 6],
         ];
 
-        foreach($activity_types as $key => $type)
+        foreach($activity_types as $type)
         {
             DB::table('activity_types')->insert([
                 'name' => $type['name'],

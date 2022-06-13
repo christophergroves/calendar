@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Venue;
+use App\Models\Activity;
+use App\Models\ActivityType;
 use Illuminate\Database\Seeder;
 
 
@@ -19,13 +21,16 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([ActivityTypeSeeder::class]);
 
-        User::factory()
+        Venue::factory()
         ->count(10)
         ->create();
 
-        Venue::factory()
-        ->count(50)
+        User::factory()
+        ->count(3)
+        ->has(Activity::factory()->count(10))
         ->create();
+
+
 
     }
 }

@@ -43,10 +43,10 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the vehicles for this user.
+     * Get the activities for this user.
      */
-    public function vehicles()
+    public function activities()
     {
-        return $this->hasMany(Vehicle::class);
+        return $this->hasMany(Activity::class);
     }
 }
