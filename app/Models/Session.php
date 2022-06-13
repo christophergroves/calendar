@@ -14,7 +14,13 @@ class Session extends Model
 
 
 
-
+    /**
+     * Get the attendance for this session.
+     */
+    public function session_attendances()
+    {
+        return $this->hasMany(SessionAttendance::class);
+    }
 
 
 

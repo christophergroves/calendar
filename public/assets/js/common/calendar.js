@@ -1,4 +1,4 @@
-function calendarGetEvents(fp, srvUsrId, start, end, timezone, callback, urlLoadEvents){
+function calendarGetEvents(fp, userId, start, end, timezone, callback, urlLoadEvents){
 
     // var urlLoadEvents = url + '/calendar/content';
     $.ajax({
@@ -11,7 +11,7 @@ function calendarGetEvents(fp, srvUsrId, start, end, timezone, callback, urlLoad
             fp: fp,
             start: date2mysql(start),
             end: date2mysql(end),
-            srvusrid: srvUsrId,
+            user_id: userId,
             
         },
         success: function(returnedData) {
@@ -677,28 +677,16 @@ function openCalendarEditChooseActionFirst(fp,calEvent, jsEvent, view, url){
             // var attendance = $('<input id="attendance" type="checkbox" disabled readonly value="attendance" name="attendance" '+ attendance +'>');
 
             var attendance = $('<h5>'+ attendance +'</h5>');
-
-            // var attendanceLabel = $('<label for="attendance" class="radio-label">&nbsp;Attended</label><br>');
-            
-            // var staffPresent = $('<input id="staff_present" type="checkbox" value="staff_present" name="staff_present" '+ staffPresentChecked +'>');
-            // var StaffPresentLabel = $('<label for="staff_present" class="radio-label">&nbsp;Staff Present</label><br>');
-            // var peerSupportPresent = $('<input id="peer_support_present" type="checkbox" value="peer_support_present" name="peer_support_present" '+ peerSupportPresentChecked +'>');
-            // var peerSupportPresentLabel = $('<label for="peer_support_present" class="radio-label">&nbsp;Peer Support Present</label>');
             
             // Put it in dialog data's container then you can get it easier by using dialog.getData() later.
             // dialog.setData('attendance', attendance);
             dialog.setData('attendance_notes', textArea);  
-            // dialog.setData('staff_present', staffPresent);
-            // dialog.setData('peer_support_present', peerSupportPresent);
+
 
             // append to dom
             containerDiv.append(form);
             form.append(textAreaLabel).append(textArea);
-            // form.append(attendance).append(attendanceLabel);
             form.append(attendance);
-
-            // form.append(staffPresent).append(StaffPresentLabel);
-            // form.append(peerSupportPresent).append(peerSupportPresentLabel);
 
             return containerDiv;
         },
@@ -714,9 +702,6 @@ function openCalendarEditChooseActionFirst(fp,calEvent, jsEvent, view, url){
                 var data = new Object;
                 data.attendance = false;
                 data.attendance_notes = dialog.getData('attendance_notes').val();
-
-                // data.staff_present = false;
-                // data.peer_support_present = false;
 
                 data._token = $('#_token').val();
 
@@ -737,8 +722,6 @@ function openCalendarEditChooseActionFirst(fp,calEvent, jsEvent, view, url){
                 data.attendance = true;
                 data.attendance_notes = dialog.getData('attendance_notes').val();
 
-                // data.staff_present = false;
-                // data.peer_support_present = false;
 
                 data._token = $('#_token').val();
 
@@ -927,9 +910,6 @@ function openCalendarActivityEdit(fp,calEvent,url){
 
                 var urlSave = url + '/calendar/activity/edit/save/' + fp + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/' + sessionDate;
                 postCalendarActivityDialogEdit(fp,calEvent,url,urlSave,calendarID,dialog,data);
-
-                    // dialog.close();
-                    //openTransportEditChooseAction(url,data,transportID,sessionID,sessionDate,recurranceType,calendarID);
                 
             }
         },{
@@ -1005,12 +985,6 @@ function openTransportEdit(fp,viewType, srvUserID,transportID,url,sessionID,sess
                 var data = $('#transport_edit_form').serialize();
                 // var start_date = $('#start_date').val();
                 // var finish_date = $('#finish_date').val();
-
-                // var one_off = false;
-                // if (start_date != '' && finish_date != '' && start_date === finish_date){
-                //     one_off = true;
-                // }
-
 
                 if(recurranceType === "0" || transportID === 0 || isExtended){
                     dialog.close();

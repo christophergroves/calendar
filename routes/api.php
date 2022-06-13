@@ -31,7 +31,7 @@ Route::put('/store', [ActivityController::class, 'store']);
 // Route::get('/', [ActivityController::class, 'index']);
 
 
-Route::get('/session/index', [SessionController::class, 'index']);
+Route::get('/sessions/content', [SessionController::class, 'content']);
 
 
 

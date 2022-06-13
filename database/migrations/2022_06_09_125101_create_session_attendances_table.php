@@ -15,6 +15,12 @@ class CreateSessionAttendancesTable extends Migration
     {
         Schema::create('session_attendances', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('session_id');
+            $table->tinyInteger('absence');
+            $table->date('absense_date');
+            $table->tinyInteger('session_deleted');
+            $table->string('attendance_notes');
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }

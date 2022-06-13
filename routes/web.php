@@ -28,7 +28,7 @@ Route::get('/', function () {
 
 Route::get('/calendar', function () {
     return view('main.calendar')
-    ->with('service_user_id',1)
+    ->with('user_id',1)
     ->with('fp',1);
 });
 

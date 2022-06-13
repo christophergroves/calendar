@@ -11,7 +11,7 @@
     var srvusr_names = false;
     var nextRec = false;
     var prevRec = false;
-    var srvUsrId = "{{ $service_user_id }}";
+    var userId = "{{ $user_id }}";
 
 
     var allowDayClick = true;
@@ -77,7 +77,7 @@
                     }else{
                         var viewType = "Name";
                         if (typeof(calEvent.activity_tutor_view) != "undefined"){viewType = "Tutor";}
-                        var urlSave = url + '/calendar/edit/dragged/save/' + "{!! $fp !!}" + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/edit-one-off/' + sessionDate + '/' + sessionDateDragStart;
+                        var urlSave = url + '/calendar/edit/dragged/save/' + "{!! $fp !!}" + '/' + viewType + '/' + calEvent.service_userId + '/' + calEvent.id + '/edit-one-off/' + sessionDate + '/' + sessionDateDragStart;
                         var calendarID = 'calendar';
                         var dialog = false;
                         postCalendarDialogform(urlSave, calendarID, dialog, data);
@@ -90,11 +90,11 @@
 			dayClick: function(date, jsEvent, view) {
 
                 if(allowDayClick){
-                     if(srvUsrId === 'false'){
+                     if(userId === 'false'){
                         openAlertDialog('Name Not Selected','<h4>Please select a name from the Name Search dropdown above right</h4>',4);
                         return false;
                     }else{
-                        openCalendarNewSessionDialog("{!! $fp !!}",srvUsrId,date,jsEvent,view,url,0);  
+                        openCalendarNewSessionDialog("{!! $fp !!}",userId,date,jsEvent,view,url,0);  
                     }
                     
                 }
@@ -112,8 +112,8 @@
 
              // Get Events        
             events: function(start, end, timezone, callback) {
-                var urlLoadEvents = url + '/calendar/content';
-                calendarGetEvents("{!! $fp !!}",srvUsrId, start, end, timezone, callback, urlLoadEvents);
+                var urlLoadEvents = url + '/api/sessions/content';
+                calendarGetEvents("{!! $fp !!}",userId, start, end, timezone, callback, urlLoadEvents);
             },
 
 

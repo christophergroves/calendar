@@ -28,6 +28,7 @@ class SessionFactory extends Factory
             'ends_on' => 1,
             'recurrance_type' => 1,
             'recurrance_interval' => 1,
+            'recurrance_number' => 1,
             'recurrance_monthly_interval' => null,
             'hours' => null,
             'updated_by' => $this->faker->numerify('###'),

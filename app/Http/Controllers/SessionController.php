@@ -2,14 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Session;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Services\CalendarService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSessionRequest;
 use App\Http\Requests\UpdateSessionRequest;
 
 class SessionController extends Controller
 {
+
+    /**
+     * Display session content for the calendar.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function content(Request $request)
+    {
+
+        $user = User::where('id',$request->all()['user_id'])->firstOrFail();
+
+        $calendar_data = CalendarService::getMonth($user);
+
+        return Response::json($calendar_data);
+    }
+
+
+
+
+
     /**
      * Display a listing of the resource.
      *

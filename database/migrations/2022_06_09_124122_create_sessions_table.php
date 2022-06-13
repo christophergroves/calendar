@@ -28,6 +28,7 @@ class CreateSessionsTable extends Migration
             $table->tinyInteger('ends_on');
             $table->tinyInteger('recurrance_type');
             $table->tinyInteger('recurrance_interval');
+            $table->tinyInteger('recurrance_number');
             $table->tinyInteger('recurrance_monthly_interval')->nullable();
             $table->unsignedInteger('hours')->nullable();
 
