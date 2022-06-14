@@ -29,11 +29,10 @@ class DatabaseSeeder extends Seeder
 
         /* For each user created also create activities
         For each activity also create sessions */ 
-        User::factory()
-        ->count(3)
-        ->has(Activity::factory()->count(3)
-            ->has(Session::factory()->count(10))
-        )
+        User::factory()->count(3)
+            ->has(Activity::factory()->count(3)
+                ->has(Session::factory()->count(10))
+            )
         ->create();
 
 

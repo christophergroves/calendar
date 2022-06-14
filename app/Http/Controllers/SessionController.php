@@ -26,7 +26,9 @@ class SessionController extends Controller
 
         $calendar_data = CalendarService::getMonth($user);
 
-        return Response::json($calendar_data);
+        
+
+        return $calendar_data;
     }
 
 
