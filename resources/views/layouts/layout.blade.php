@@ -14,8 +14,7 @@
 
 						<div class="well">
 
-							{{-- <h1>CALEDAR</h1> --}}
-
+							@yield('title')
 							@yield('section_1')
 
 						</div>

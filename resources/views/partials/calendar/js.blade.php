@@ -1,4 +1,3 @@
-        
 <script type="text/javascript">
         
     var url = "{!! URL::to('') !!}";
@@ -8,33 +7,23 @@
     var calendarEditSessionDialog = false;
     var monthLastClickTime = false;
     var calendar = false;
-    var srvusr_names = false;
-    var nextRec = false;
-    var prevRec = false;
     var userId = "{{ $user_id }}";
 
 
     var allowDayClick = true;
-
-
 
     var session_date_drag_start = false;
 
     var toolTipData = { attendance: {'':'Yes', 0: 'Yes', 1: 'No' },
                         recurrance_type: { 0: 'One Off', 1: 'week', 2: 'month' },
                         session_day: {1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday',7:'Sunday'},
-                        staff_present: {'':'No', 1: 'Yes' },
-                        peer_support_present: {'':'No', 1: 'Yes' },
                     };
 
 
       
 	$(document).ready(function() {
-            
-		// initDatePicker('#start_date');
-		// initDatePicker('#finish_date');
-        disableSubmitFormOnEnter();
 
+        disableSubmitFormOnEnter();
 
         calendar = $('#calendar');
 		
@@ -44,28 +33,20 @@
                 center: 'title',
                 right: 'month,basicWeek,basicDay'
 			},
-                columnFormat: {
-                    week: 'ddd D/M',
-                },
+            columnFormat: {
+                week: 'ddd D/M',
+            },
 			firstDay: 1,
-            // contentHeight: 800,
             eventStartEditable: true,
             eventDurationEditable: false,
             height: "auto",
-            // contentHeight: 600,
-            // height: 1200,
-
-             // contentHeight: 1200,
 
 
             eventDragStart: function( calEvent ) {
-
                 sessionDateDragStart = date2mysql(calEvent.start);
-
             },
 
             eventDrop: function(calEvent,dayDelta,minuteDelta,allDay,revertFunc) {
-
 
                     var sessionDate  = date2mysql(calEvent.start);
                     var sessionDateChanged  = true;
@@ -73,11 +54,9 @@
                     data._token = $('#_token').val();
 
                     if(calEvent.recurrance_type !== '0'){
-                        openCalendarChooseActionEventDragged("{!! $fp !!}",calEvent,sessionDateDragStart,url,data,sessionDateChanged);
+                        openCalendarChooseActionEventDragged(calEvent,sessionDateDragStart,url,data,sessionDateChanged);
                     }else{
-                        var viewType = "Name";
-                        if (typeof(calEvent.activity_tutor_view) != "undefined"){viewType = "Tutor";}
-                        var urlSave = url + '/calendar/edit/dragged/save/' + "{!! $fp !!}" + '/' + viewType + '/' + calEvent.userId + '/' + calEvent.id + '/edit-one-off/' + sessionDate + '/' + sessionDateDragStart;
+                        var urlSave = url + '/calendar/edit/dragged/save/' + calEvent.userId + '/' + calEvent.id + '/edit-one-off/' + sessionDate + '/' + sessionDateDragStart;
                         var calendarID = 'calendar';
                         var dialog = false;
                         postCalendarDialogform(urlSave, calendarID, dialog, data);
@@ -94,26 +73,47 @@
                         openAlertDialog('Name Not Selected','<h4>Please select a name from the Name Search dropdown above right</h4>',4);
                         return false;
                     }else{
-                        openCalendarNewSessionDialog("{!! $fp !!}",userId,date,jsEvent,view,url,0);  
+                        let request = {};
+                        request.url = url + '/calendar/edit/dialog/content/';
+                        request.data = {
+                            'userId': userId,
+                            'action': 'edit-new',
+                            'sessionDate': date2mysql(date),
+                            'activityId': 0,
+
+                        };
+
+
+                        
+                        openCalendarNewSessionDialog(request,date);  
                     }
                     
                 }
 			},
 
 			eventClick: function(calEvent, jsEvent, view) {
-
-                if(allowDayClick){
-                    openCalendarEditChooseActionFirst("{!! $fp !!}",calEvent, jsEvent, view, url);
-                }
-                
+                openCalendarEditChooseActionFirst(calEvent, jsEvent, view, url);
 			},
 
 			defaultDate: new Date(),
 
-             // Get Events        
+            // Get Events       
             events: function(start, end, timezone, callback) {
-                var urlLoadEvents = url + '/api/sessions/content';
-                calendarGetEvents("{!! $fp !!}",userId, start, end, timezone, callback, urlLoadEvents);
+
+                $.ajax({
+                    url: url + '/api/sessions/content',
+                    data: data = {
+                        "userId": userId,
+                        "start":date2mysql(start),
+                        "end": date2mysql(end),
+                    },
+                    success: function(returnedData) {
+                        callback(returnedData.events)
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        callback(xhr + ' ' + errorThrown);
+                    }
+                });
             },
 
 
@@ -126,5 +126,10 @@
             },
 		});     
 	});
+
+    function callbackEvents(data){
+        console.log(data.events);
+        callback_events(data.events);
+    }
 
 </script>

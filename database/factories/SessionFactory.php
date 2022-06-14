@@ -17,7 +17,6 @@ class SessionFactory extends Factory
         $activity = Activity::inRandomOrder()->first();
 
         return [
-
             'activity_id' => $activity->id,
             'parent_id' => null,
             'session_day' =>rand(1,7),
@@ -30,7 +29,7 @@ class SessionFactory extends Factory
             'recurrance_interval' => 1,
             'recurrance_number' => 1,
             'recurrance_monthly_interval' => null,
-            'hours' => null,
+            'hours' => $this->faker->numerify('#'),
             'updated_by' => $this->faker->numerify('###'),
         ];
     }

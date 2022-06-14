@@ -11,7 +11,7 @@ class TestCodeController extends Controller
 {
     public function test(Request $request)
     {
-       
+       return $request->all();
 
     }
 

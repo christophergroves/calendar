@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Http\Resources\UserResource;
 use DateTime;
 use stdClass;
 use Illuminate\Support\Facades\DB;
-// use PhpParser\Builder\Class_;
 
 require_once app_path().'/Includes/constants/sql_constants.php';
 
@@ -22,7 +22,6 @@ public static function getMonth($user)
             $week_ending = clone $week_beginning;
             $week_ending->modify('+6 Day');
 
-
             for ($i = 0; $i < 6; $i++) 
             {
                 $allrows = self::getEventsQuery($week_beginning, $week_ending, $user);
@@ -31,29 +30,20 @@ public static function getMonth($user)
                 {
                     foreach ($allrows as $row) 
                     {
-                        if (! self::checkIncludeOccurance($row)) 
-                        {
-                            continue;
-                        }
+                        if (!self::checkIncludeOccurance($row)) { continue;}
 
-                        switch ($row->category):
-                            case 'Social':
-                                $background_color = '#3A87AD';
+                        switch ($row->category): 
+                            case 'Social': $background_color = '#3A87AD';
                             break;
-                            case 'Training':
-                                $background_color = '#3C967B';
+                            case 'Training': $background_color = '#3A87AD;';
                             break;
-                            case 'Practical':
-                                $background_color = '#9B5115';
+                            case 'Practical': $background_color = '#9B5115';
                             break;
-                            case 'WorkExp':
-                                $background_color = '#699E35';
+                            case 'WorkExp': $background_color = '#699E35';
                             break;
-                            case 'ProgPlanning':
-                                $background_color = '#8092A3';
+                            case 'ProgPlanning': $background_color = '#8092A3';
                             break;
-                            default:
-                                $background_color = '#3A87AD';
+                            default: $background_color = '#3A87AD';
                         endswitch;
                         
                         $event = [];
@@ -62,36 +52,22 @@ public static function getMonth($user)
                         {
                             $event[$key] = strip_tags($value);
                         }
-                        if ($row->start_time) {$event['start'] .= 'T'.strip_tags($row->start_time);}
 
+                        if ($row->start_time) {$event['start'] .= 'T'.strip_tags($row->start_time);}
                         $event['textColor'] = $row->attendance ? '#FFD20F' : 'white';
                         $event['backgroundColor'] = $background_color;
                         $event['borderColor'] = $background_color;
-
                         $event['week_beginning'] = $week_beginning->format('Y-m-d');
                         $event['week_ending'] = $week_ending->format('Y-m-d');
-
                         $events[] = $event;
-                
                     }
                 }
-
                 $week_beginning->modify('+1 Week');
                 $week_ending->modify('+1 Week');
             }
-
-            // $time_end = microtime(true);
-            //dividing with 60 will give the execution time in minutes other wise seconds
-            // $execution_time = substr($time_end - $time_start,0,6);
-
-            // substr($string,0,10)
-            //execution time of the script
-            // echo '<b>Total Execution Time:</b> '.$execution_time.' Mins';
         }
 
-  
-        $events = ['events'=>$events, 'user'=>$user];
-
+        $events = ['events'=>$events, 'user'=> new UserResource($user)];
         return $events;
     }
 
@@ -101,15 +77,15 @@ public static function getMonth($user)
     {
         $include = false;
         switch ((int) $row->recurrance_type) :
-                case 0:
-                   return true;
+        case 0:
+            return true;
         break;
         case 1:
-                   return true;
+            return true;
         // if ((int)$row->week_diff === 0 || (int)$row->week_diff % (int)$row->recurrance_interval === 0) {$include = true;}
         break;
         case 2:
-                    $start_date = DateTime::createFromFormat('Y-m-d', $row->session_start_date);
+        $start_date = DateTime::createFromFormat('Y-m-d', $row->session_start_date);
         $session_date = DateTime::createFromFormat('Y-m-d', $row->session_date);
         $recurrance_days = [1 => 'mon', 2 => 'tue', 3 => 'wed', 4 => 'thu', 5 => 'fri', 6 => 'sat', 7 => 'sun'];
         $occurance_date = clone $session_date;
@@ -123,9 +99,6 @@ public static function getMonth($user)
         }
         break;
         endswitch;
-
-        // dd($indlude);
-
         return $include;
     }
 
@@ -152,16 +125,8 @@ public static function getMonth($user)
         sessions.recurrance_monthly_interval,
         activity_types.category,
    
-
-
-
-
-
         CONCAT(activity_types.name,' @ ',venues.name,' - ',activities.description) AS title,
 
-      
-
-      
         DATE_ADD(:week_beginning, INTERVAL sessions.session_day - 1 DAY) as start,
 
         DATE_FORMAT(sessions.start_date,'%d/%m/%Y') AS session_start_date,
@@ -176,9 +141,6 @@ public static function getMonth($user)
         sessions.hours,
         TSubChild.parent_id_child,
         session_attendances.session_deleted
-
-
-   
 
         FROM
         sessions
@@ -224,14 +186,24 @@ public static function getMonth($user)
         ORDER BY session_day ASC,
         sessions.start_time ASC";
 
-
         $allrows = DB::select($query, $bind);
-
-        // dd($allrows);
-
         return $allrows;
-        
+    }
 
+    public static function diffInMonths($start, $end)
+    {
+        $diffYears = $end->format('Y') - $start->format('Y');
+        $diffMonths = $end->format('m') - $start->format('m');
+
+        if ($diffMonths < 0) {
+            $diffMonths = 12 + $diffMonths;
+            if ($diffYears > 0) {
+                $diffYears -= 1;
+            }
+        }
+        $total_diff = $diffMonths + ($diffYears * 12);
+
+        return $total_diff;
     }
 
 
@@ -418,152 +390,6 @@ public static function getMonth($user)
 
 
 
-    private static function runGetEventsQuery($week_beginning, $week_ending, $service_user)
-    {
-        $bind = [
-                    ':week_beginning' => $week_beginning->format('Y-m-d'),
-                    ':week_ending' => $week_ending->format('Y-m-d'),
-                    ':service_user_id' => $service_user->id,
-            ];
-
-        $query = "SELECT
-                activities.service_user_id,
-                CONCAT_WS(' ',contacts.firstname,contacts.surname) AS service_user_name,
-                sessions.id AS sessID,
-                sessions.parent_id,
-                sessions.session_day AS sessDay,
-                sessions.activity_id,
-                -- CONCAT(activity_classes.class_name,' [',activity_classes.class_tutor,']') as activity_class,
-
-                CONCAT_WS(' ',tutorStaff.firstname,tutorStaff.surname) AS tutor,
-
-
-                CONCAT_WS(' ',caseOfficer.firstname,caseOfficer.surname) AS case_officer,
-
-                
-                sessions.recurrance_type,
-                sessions.recurrance_interval,
-                sessions.recurrance_number,
-
-                sessions.recurrance_monthly_interval,
-                activity_types.category as activity_type_category,
-                attendance.session_deleted,
-
-
-                CONCAT(StaffUpdateActivity.firstname, ' ', StaffUpdateActivity.surname) as updated_by_activity,
-                DATE_FORMAT( activities.updated_at,'%d/%m/%Y %H:%i') AS updated_at_activity,
-                
-                CONCAT(StaffUpdateSession.firstname, ' ', StaffUpdateSession.surname) as updated_by_session,
-                DATE_FORMAT( sessions.updated_at,'%d/%m/%Y %H:%i') AS updated_at_session,
-                
-                CONCAT(StaffUpdateAttendance.firstname, ' ', StaffUpdateAttendance.surname) as updated_by_attendance,
-                DATE_FORMAT( attendance.updated_at,'%d/%m/%Y %H:%i') AS updated_at_attendance,
-
-
-                CONCAT(activity_types.type,' @ ',providers.provider_name,' - ',activities.description) AS activity,
-
-                GROUP_CONCAT(TPSub.transport_provider SEPARATOR ', ') AS transport_provider,
-
-              
-                DATE_ADD(:week_beginning, INTERVAL sessions.session_day - 1 DAY) as session_date,
-
-                DATE_FORMAT(sessions.start_date,'%d/%m/%Y') AS session_start_date_uk,
-                DATE_FORMAT(sessions.finish_date,'%d/%m/%Y') AS session_finish_date_uk,
-
-
-                sessions.start_date as session_start_date,
-                sessions.finish_date as session_finish_date,
-
-
-
-                DATE_FORMAT(start_time, '%H:%i') as start_time,
-                DATE_FORMAT(finish_time, '%H:%i') as finish_time,
-                -- sessions.start_date,
-                -- sessions.finish_date,
-                attendance.absence as attendance,
-                attendance.attendance_notes,
-                sessions.hours,
-                attendance.staff_present,
-                attendance.peer_support_present,
-                GROUP_CONCAT(TPSub.transport_provider SEPARATOR ', ') AS transport_provider,
-                TSubChild.parent_id_child
-                FROM
-                sessions
-                INNER JOIN activities ON activities.id = sessions.activity_id
-                -- LEFT JOIN activity_classes ON activity_classes.id = activities.activity_class_id
-
-                INNER JOIN activity_types ON activity_types.id = activities.activity_type_id
-
-                INNER JOIN providers ON providers.id = activities.provider_id
-                INNER JOIN contacts ON contacts.service_user_id = activities.service_user_id AND contacts.contact_type_id = 1
-                LEFT JOIN attendance ON attendance.session_id = sessions.id AND absence_date = DATE_ADD(:week_beginning,INTERVAL sessions.session_day - 1 DAY)
-
-                LEFT JOIN staff AS tutorStaff ON tutorStaff.id = activities.tutor_staff_id
-
-
-
-                LEFT JOIN service_users2staff ON service_users2staff.service_user_id = activities.service_user_id AND service_users2staff.active = 1
-                LEFT JOIN staff AS caseOfficer ON caseOfficer.id = service_users2staff.staff_id
-
-
-                LEFT JOIN staff as StaffUpdateActivity ON StaffUpdateActivity.id = activities.updated_by
-                LEFT JOIN staff as StaffUpdateSession ON StaffUpdateSession.id = sessions.updated_by
-                LEFT JOIN staff as StaffUpdateAttendance ON StaffUpdateAttendance.id = attendance.updated_by
-
-
-
-
-                LEFT JOIN 
-                (SELECT
-                transports.session_id,
-                CONCAT(transport_providers.short_name,' (£',CAST(transports.cost AS CHAR),')') AS transport_provider
-                FROM 
-                transports
-                INNER JOIN sessions ON sessions.id = transports.session_id
-                INNER JOIN transport_providers ON transport_providers.id = transports.transport_provider_id
-                WHERE 
-
-                (transports.start_date <= DATE_ADD(:week_beginning,INTERVAL sessions.session_day - 1 DAY) OR
-                transports.start_date IS NULL OR 
-                transports.start_date=0) AND
-                (transports.finish_date >= DATE_ADD(:week_beginning,INTERVAL sessions.session_day - 1 DAY) OR
-                transports.finish_date IS NULL OR
-                transports.finish_date=0))
-
-
-
-                AS TPSub ON TPSub.session_id = sessions.id ".
-                LEFT_JOIN_GET_CALENDAR_SESSION_CHILD.
-
-                " WHERE
-
-                activities.service_user_id = :service_user_id AND
-            
-                sessions.start_date <= :week_ending AND
-
-                (sessions.finish_date IS NULL OR 
-                sessions.finish_date = 0 OR 
-                sessions.finish_date >=  DATE_ADD(:week_beginning,INTERVAL sessions.session_day - 1 DAY))
-
-                AND
-                (attendance.id IS NULL OR attendance.session_deleted IS NULL OR attendance.session_deleted = 0) 
-
-                AND 
-                (sessions.recurrance_type = 0 || sessions.recurrance_type = 2 ||
-                (DATEDIFF(sessions.start_date,DATE_ADD(:week_beginning, INTERVAL sessions.session_day - 1 DAY))/7) % sessions.recurrance_interval = '0')
-
-                GROUP BY sessions.id
-                ORDER BY session_day ASC,
-                sessions.start_time ASC";
-
-        // dd($bind);
-
-        $allrows = DB::select($query, $bind);
-
-        // dd($allrows);
-
-        return $allrows;
-    }
 
 
 
