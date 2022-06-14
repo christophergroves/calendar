@@ -2,8 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
 	@include('partials.common.links')
-
 	@yield('view_specific_links')
+	@yield('view_specific_css')
 </head>
 
 	<body>

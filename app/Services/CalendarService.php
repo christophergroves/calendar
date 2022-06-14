@@ -27,8 +27,6 @@ public static function getMonth($user)
             {
                 $allrows = self::getEventsQuery($week_beginning, $week_ending, $user);
 
-                
-
                 if ($allrows) 
                 {
                     foreach ($allrows as $row) 
@@ -38,111 +36,49 @@ public static function getMonth($user)
                             continue;
                         }
 
-                        switch ($row->activity_type_category) :
-                        case 'Social':
-                                        $background_color = '#3A87AD';
-                        break;
-                        case 'Training':
-                                        $background_color = '#3C967B';
-                        break;
-                        case 'Practical':
-                                            // $background_color = '#914D14';
-                                            $background_color = '#9B5115';
-
-                        break;
-                        case 'WorkExp':
-                                        // $background_color = '#669933';
-                                            $background_color = '#699E35';
-
-                        break;
-                        case 'ProgPlanning':
-                                        $background_color = '#8092A3';
-                        break;
-                        default:
-                                        $background_color = '#3A87AD';
+                        switch ($row->category):
+                            case 'Social':
+                                $background_color = '#3A87AD';
+                            break;
+                            case 'Training':
+                                $background_color = '#3C967B';
+                            break;
+                            case 'Practical':
+                                $background_color = '#9B5115';
+                            break;
+                            case 'WorkExp':
+                                $background_color = '#699E35';
+                            break;
+                            case 'ProgPlanning':
+                                $background_color = '#8092A3';
+                            break;
+                            default:
+                                $background_color = '#3A87AD';
                         endswitch;
                         
-
-                        // $event = new stdClass();
-
                         $event = [];
-
 
                         foreach($row as $key => $value)
                         {
                             $event[$key] = strip_tags($value);
                         }
-
-                 
-
                         if ($row->start_time) {$event['start'] .= 'T'.strip_tags($row->start_time);}
-                        $event['title'] = strip_tags($row->activity);
 
+                        $event['textColor'] = $row->attendance ? '#FFD20F' : 'white';
+                        $event['backgroundColor'] = $background_color;
+                        $event['borderColor'] = $background_color;
 
-                        dd($event);
-
-
-
-
-
-
-
-
-                        $event->id = strip_tags($row->session_id);
-                        $event->activity_id = strip_tags($row->activity_id);
-                        $event->session_day = strip_tags($row->session_day);
-                        $event->title = strip_tags($row->activity);
-                        $event->start = strip_tags($row->session_date);
-
-                        // If there is a start time then concatenate start date and start time with T separator
-                        if ($row->start_time) {$event->start .= 'T'.strip_tags($row->start_time);}
-
-                        $event->session_start_date = strip_tags($row->session_start_date_uk);
-                        $event->session_finish_date = strip_tags($row->session_finish_date_uk);
-
-                        $event->start_time = strip_tags($row->start_time);
-                        $event->finish_time = strip_tags($row->finish_time);
-                        $event->hours = strip_tags($row->hours);
-
-                        $event->parent_id = strip_tags($row->parent_id);
-                        $event->parent_id_child = strip_tags($row->parent_id_child);
-                        $event->attendance = strip_tags($row->attendance);
-                        $event->attendance_notes = strip_tags($row->attendance_notes);
-                        $event->session_deleted = strip_tags($row->session_deleted);
-                        $event->recurrance_type = strip_tags($row->recurrance_type);
-                        $event->recurrance_interval = strip_tags($row->recurrance_interval);
-                        $event->recurrance_number = strip_tags($row->recurrance_number);
-
-                        $event->textColor = $row->attendance ? '#FFD20F' : 'white';
-
-                        $event->backgroundColor = $background_color;
-                        $event->borderColor = $background_color;
-
-
-                        $event->tutor = strip_tags($row->tutor);
-                        $event->case_officer = strip_tags($row->case_officer);
-
-                        $event->service_user_id = strip_tags($row->service_user_id);
-                        $event->service_user_name = strip_tags($row->service_user_name);
-
-                        $event->transport_provider = strip_tags($row->transport_provider);
-
-                        $event->updated_activity = strip_tags($row->updated_by_activity.' '.$row->updated_at_activity);
-                        $event->updated_session = strip_tags($row->updated_by_session.' '.$row->updated_at_session);
-                        $event->updated_attendance = strip_tags($row->updated_by_attendance.' '.$row->updated_at_attendance);
-
-                        $event->week_beginning = $week_beginning->format('Y-m-d');
-                        $event->week_ending = $week_ending->format('Y-m-d');
+                        $event['week_beginning'] = $week_beginning->format('Y-m-d');
+                        $event['week_ending'] = $week_ending->format('Y-m-d');
 
                         $events[] = $event;
+                
                     }
                 }
 
                 $week_beginning->modify('+1 Week');
                 $week_ending->modify('+1 Week');
             }
-
-
 
             // $time_end = microtime(true);
             //dividing with 60 will give the execution time in minutes other wise seconds
@@ -214,14 +150,14 @@ public static function getMonth($user)
         sessions.recurrance_interval,
         sessions.recurrance_number,
         sessions.recurrance_monthly_interval,
-        activity_types.category as activity_type_category,
+        activity_types.category,
    
 
 
 
 
 
-        CONCAT(activity_types.name,' @ ',venues.name,' - ',activities.description) AS activity,
+        CONCAT(activity_types.name,' @ ',venues.name,' - ',activities.description) AS title,
 
       
 
@@ -233,14 +169,16 @@ public static function getMonth($user)
 
         DATE_FORMAT(start_time, '%H:%i') as start_time,
         DATE_FORMAT(finish_time, '%H:%i') as finish_time,
-        -- sessions.start_date,
-        -- sessions.finish_date,
+
         session_attendances.absence as attendance,
         session_attendances.attendance_notes,
         session_attendances.absense_date,
         sessions.hours,
         TSubChild.parent_id_child,
         session_attendances.session_deleted
+
+
+   
 
         FROM
         sessions

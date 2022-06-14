@@ -15,8 +15,8 @@ class ActivityTypeSeeder extends Seeder
     public function run()
     {
         $activity_types = [
-            ['name' => 'Training (Accredited)','category' => 'Theory', 'list_position' => 1],
-            ['name' => 'Training (Non-Accredited)','category' => 'Theory', 'list_position' => 2],
+            ['name' => 'Training (Accredited)','category' => 'Training', 'list_position' => 1],
+            ['name' => 'Training (Non-Accredited)','category' => 'Training', 'list_position' => 2],
             ['name' => 'Work Prep','category' => 'WorkExp', 'list_position' => 3],
             ['name' => 'Work Placement','category' => 'WorkExp', 'list_position' => 4],
             ['name' => 'Work Paid','category' => 'WorkExp', 'list_position' => 5],

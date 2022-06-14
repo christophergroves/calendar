@@ -5,6 +5,10 @@
     @include('partials.calendar.links')
 @endsection
 
+@section('view_specific_css')
+    @include('partials.calendar.css')
+@endsection
+
 
 @section('section_1')
     <div id='calendar'></div>

@@ -16,18 +16,8 @@ function calendarGetEvents(fp, userId, start, end, timezone, callback, urlLoadEv
         },
         success: function(returnedData) {
 
-            srvUsrId = returnedData.service_user.service_user_id;
             refreshCalendarNameSearchSelect2(returnedData);
-
-            
-            if (srvUsrId) {
-                refreshServiceUserDescription(returnedData,start,end);
-                callback(returnedData.events);
-            }else{
-                $('#service_user_name').html('Please select a name');
-            }
-            
-            clearNameSearchSelect("#nameSearchSel",1);
+            callback(returnedData.events);
         },
         error: function(xhr, textStatus, errorThrown) {
             if (textStatus == 'timeout') {//if error is 'timeout'
@@ -347,22 +337,22 @@ function calendarShowTooltip(data, event, view){
                 + '<span class="tooltip_label">Times: &nbsp;</span>' + data.start_time + ' - ' + data.finish_time + '</br>'
                 + '<span class="tooltip_label">Hours: &nbsp;</span>' + data.hours 
                 + '<div style="height:5px;"></div>'
-                + '<span class="tooltip_label">Attended: &nbsp;</span>' + toolTipData.attendance[data.attendance] + '</br>' 
-                + '<span class="tooltip_label">Att Notes: &nbsp;</span>' + data.attendance_notes
-                + '<div style="height:5px;"></div>'
+                // + '<span class="tooltip_label">Attended: &nbsp;</span>' + toolTipData.attendance[data.attendance] + '</br>' 
+                // + '<span class="tooltip_label">Att Notes: &nbsp;</span>' + data.attendance_notes
+                // + '<div style="height:5px;"></div>'
 
-                + tutorOrCaseOfficerText
+                // + tutorOrCaseOfficerText
 
-                + '<div style="height:5px;"></div>'
+                // + '<div style="height:5px;"></div>'
 
-                + '<span class="tooltip_label">Transport: &nbsp;</span>' + data.transport_provider 
-                + '<div style="height:8px;"></div>'
+                // + '<span class="tooltip_label">Transport: &nbsp;</span>' + data.transport_provider 
+                // + '<div style="height:8px;"></div>'
                 
-                    + '<div style=" font-size:9px; line-height: 115%;">'
-                        + '<span style="font-weight:bold;">Activity updated: &nbsp;</span>' + data.updated_activity + '</br>'
-                        + '<span style="font-weight:bold;">Session updated: &nbsp;</span>' + data.updated_session + '</br>'
-                        + '<span style="font-weight:bold;">Attendance updated: &nbsp;</span>' + data.updated_attendance
-                + '</div>'
+                //     + '<div style=" font-size:9px; line-height: 115%;">'
+                //         + '<span style="font-weight:bold;">Activity updated: &nbsp;</span>' + data.updated_activity + '</br>'
+                //         + '<span style="font-weight:bold;">Session updated: &nbsp;</span>' + data.updated_session + '</br>'
+                //         + '<span style="font-weight:bold;">Attendance updated: &nbsp;</span>' + data.updated_attendance
+                // + '</div>'
 
             + '</div>'
         + '</div>';

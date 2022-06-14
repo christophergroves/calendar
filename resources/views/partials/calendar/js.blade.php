@@ -77,7 +77,7 @@
                     }else{
                         var viewType = "Name";
                         if (typeof(calEvent.activity_tutor_view) != "undefined"){viewType = "Tutor";}
-                        var urlSave = url + '/calendar/edit/dragged/save/' + "{!! $fp !!}" + '/' + viewType + '/' + calEvent.service_userId + '/' + calEvent.id + '/edit-one-off/' + sessionDate + '/' + sessionDateDragStart;
+                        var urlSave = url + '/calendar/edit/dragged/save/' + "{!! $fp !!}" + '/' + viewType + '/' + calEvent.userId + '/' + calEvent.id + '/edit-one-off/' + sessionDate + '/' + sessionDateDragStart;
                         var calendarID = 'calendar';
                         var dialog = false;
                         postCalendarDialogform(urlSave, calendarID, dialog, data);

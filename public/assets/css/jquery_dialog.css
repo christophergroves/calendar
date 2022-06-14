@@ -1,0 +1,52 @@
+/* CSS Document */
+
+.ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size:75%;}
+.ui-datepicker {font-size: 85%;}
+
+div#StatusDialog {padding:18px 30px 30px 50px;font-size:120%;}
+div#StatusDialog label {font-size:11pt; display:block;}
+div#StatusDialog input {font-size:12pt;}
+
+#status{font-family: sans-serif; font-size:10pt;font-weight:bold;}
+
+div#newReviewDialog{padding:18px 30px 19px 50px;font-size:120%;}
+div#newReviewDialog label {font-size:115%; display:block;}
+div#newReviewDialog input {font-size:115%;}
+
+
+div#attDialog { padding: 12px 30px 6px 18px;font-size:110%;}
+div#attDialog label {display:block;}
+div#attDialog input {font-size:12pt;
+
+}
+
+
+.dialogSelect{
+	border: 1px solid #A6C9E2;
+	border-radius: 5px;
+	 padding: 3px;
+}
+
+.dialogTextarea {
+	
+	width:200px;
+	min-width: 200px;
+	max-width: 200px;
+	max-height: 150px;
+	 padding: 3px;
+	border: 1px solid #A6C9E2;
+	border-radius: 5px;
+/*	height: 34px;
+    max-height: 130px;
+    max-width: 250px;
+    min-width: 250x;
+   
+*/
+}
+
+
+
+.ui-dialog{font-size:80%;}
+
+
+
