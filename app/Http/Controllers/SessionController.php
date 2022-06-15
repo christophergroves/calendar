@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSessionRequest;
 use App\Http\Requests\UpdateSessionRequest;
 use DateTime;
+use stdClass;
 
 class SessionController extends Controller
 {
@@ -211,10 +212,10 @@ class SessionController extends Controller
             array_push($recurrance_intervals, $i);
         }
 
-
         $hours = [''=>'Select hours ...', 0=>'0', 1=>'1', 2=>'2', 3=>'3', 4=>'4', 8=>'8', 12=>'12'];
-
-
+        $disabled_elements = [];
+        $errors = false;
+        
 
         if (!$request['sessionId']) 
         {
@@ -280,7 +281,7 @@ class SessionController extends Controller
         $activities = CalendarService::getActivitiesEditList($user);
 
 
-        return '<p>Returned HTML from get form html</p>';
+        // return '<p>Returned HTML from get form html</p>';
 
          return view('main.calendar.calendar_edit_dialog_content')
             ->with('user', $user)
@@ -296,6 +297,8 @@ class SessionController extends Controller
             ->with('session_date', $session_date->format('Y-m-d'))
             ->with('start_date_label', $start_date_label)
             ->with('edit_dialog_title', $edit_dialog_title)
+            ->with('errors',$errors)
+            ->with('disabled_elements', $disabled_elements)
             ->with('ends_on', $ends_on);
 
     
@@ -405,8 +408,6 @@ class SessionController extends Controller
                 $session_days[$i] = false;
             }
         }
-
-       
 
         return view('main.calendar.calendar_edit_dialog_content')
                         ->with('user', $user)
