@@ -139,6 +139,12 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
+
+        // Laravel Collective HTML and Form Helpers ------------
+        Collective\Html\HtmlServiceProvider::class,
+        // -----------------------------------------------------
+
+
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
@@ -161,6 +167,8 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        
+
 
         /*
          * Package Service Providers...
@@ -189,6 +197,14 @@ return [
     */
 
     'aliases' => [
+
+
+         // Laravel Collective Form and HTML Helpers, also FormElement and SiteService Helpers----------------------------
+         'Form' => Collective\Html\FormFacade::class,
+         'HTML' => Collective\Html\HtmlFacade::class,
+         'FormElement'=> App\Helpers\FormElement::class,
+         'SiteService' => App\Helpers\SiteService::class,
+         //  -------------------------------------------------------------------
 
         'App' => Illuminate\Support\Facades\App::class,
         'Arr' => Illuminate\Support\Arr::class,
@@ -229,6 +245,9 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+
+    
+
 
     ],
 

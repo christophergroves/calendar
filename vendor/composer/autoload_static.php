@@ -10,8 +10,8 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
@@ -35,6 +35,7 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'c7a3c339e7e14b60e06a2d7fcce9476b' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
+        'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
@@ -165,6 +166,7 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'C' => 
         array (
             'Cron\\' => 5,
+            'Collective\\Html\\' => 16,
             'Carbon\\' => 7,
         ),
         'B' => 
@@ -487,6 +489,10 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         array (
             0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',
         ),
+        'Collective\\Html\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laravelcollective/html/src',
+        ),
         'Carbon\\' => 
         array (
             0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
@@ -536,15 +542,17 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Http\\Requests\\StoreActivityRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreActivityRequest.php',
         'App\\Http\\Requests\\StoreActivityTypeRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreActivityTypeRequest.php',
+        'App\\Http\\Requests\\StoreAttendanceRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreAttendanceRequest.php',
         'App\\Http\\Requests\\StoreSessionAttendanceRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreSessionAttendanceRequest.php',
         'App\\Http\\Requests\\StoreSessionRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreSessionRequest.php',
         'App\\Http\\Requests\\StoreVenueRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreVenueRequest.php',
         'App\\Http\\Requests\\UpdateActivityRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateActivityRequest.php',
         'App\\Http\\Requests\\UpdateActivityTypeRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateActivityTypeRequest.php',
+        'App\\Http\\Requests\\UpdateAttendanceRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateAttendanceRequest.php',
         'App\\Http\\Requests\\UpdateSessionAttendanceRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateSessionAttendanceRequest.php',
         'App\\Http\\Requests\\UpdateSessionRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateSessionRequest.php',
         'App\\Http\\Requests\\UpdateVenueRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateVenueRequest.php',
-        'App\\Http\\Resources\\Session' => __DIR__ . '/../..' . '/app/Http/Resources/Session.php',
+        'App\\Http\\Resources\\UserResource' => __DIR__ . '/../..' . '/app/Http/Resources/UserResource.php',
         'App\\Models\\Activity' => __DIR__ . '/../..' . '/app/Models/Activity.php',
         'App\\Models\\ActivityType' => __DIR__ . '/../..' . '/app/Models/ActivityType.php',
         'App\\Models\\Attendance' => __DIR__ . '/../..' . '/app/Models/Attendance.php',
@@ -554,6 +562,7 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'App\\Models\\Venue' => __DIR__ . '/../..' . '/app/Models/Venue.php',
         'App\\Policies\\ActivityPolicy' => __DIR__ . '/../..' . '/app/Policies/ActivityPolicy.php',
         'App\\Policies\\ActivityTypePolicy' => __DIR__ . '/../..' . '/app/Policies/ActivityTypePolicy.php',
+        'App\\Policies\\AttendancePolicy' => __DIR__ . '/../..' . '/app/Policies/AttendancePolicy.php',
         'App\\Policies\\SessionAttendancePolicy' => __DIR__ . '/../..' . '/app/Policies/SessionAttendancePolicy.php',
         'App\\Policies\\SessionPolicy' => __DIR__ . '/../..' . '/app/Policies/SessionPolicy.php',
         'App\\Policies\\VenuePolicy' => __DIR__ . '/../..' . '/app/Policies/VenuePolicy.php',
@@ -659,6 +668,13 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'Carbon\\Translator' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Translator.php',
         'Carbon\\TranslatorImmutable' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/TranslatorImmutable.php',
         'Carbon\\TranslatorStrongTypeInterface' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/TranslatorStrongTypeInterface.php',
+        'Collective\\Html\\Componentable' => __DIR__ . '/..' . '/laravelcollective/html/src/Componentable.php',
+        'Collective\\Html\\Eloquent\\FormAccessible' => __DIR__ . '/..' . '/laravelcollective/html/src/Eloquent/FormAccessible.php',
+        'Collective\\Html\\FormBuilder' => __DIR__ . '/..' . '/laravelcollective/html/src/FormBuilder.php',
+        'Collective\\Html\\FormFacade' => __DIR__ . '/..' . '/laravelcollective/html/src/FormFacade.php',
+        'Collective\\Html\\HtmlBuilder' => __DIR__ . '/..' . '/laravelcollective/html/src/HtmlBuilder.php',
+        'Collective\\Html\\HtmlFacade' => __DIR__ . '/..' . '/laravelcollective/html/src/HtmlFacade.php',
+        'Collective\\Html\\HtmlServiceProvider' => __DIR__ . '/..' . '/laravelcollective/html/src/HtmlServiceProvider.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Cron\\AbstractField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/AbstractField.php',
         'Cron\\CronExpression' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/CronExpression.php',
@@ -672,13 +688,13 @@ class ComposerStaticInitfee75bb08a087726116766494c2e52de
         'Cron\\MonthField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/MonthField.php',
         'Database\\Factories\\ActivityFactory' => __DIR__ . '/../..' . '/database/factories/ActivityFactory.php',
         'Database\\Factories\\ActivityTypeFactory' => __DIR__ . '/../..' . '/database/factories/ActivityTypeFactory.php',
-        'Database\\Factories\\AttendanceFactory' => __DIR__ . '/../..' . '/database/factories/AttendanceFactory.php',
         'Database\\Factories\\SessionAttendanceFactory' => __DIR__ . '/../..' . '/database/factories/SessionAttendanceFactory.php',
         'Database\\Factories\\SessionFactory' => __DIR__ . '/../..' . '/database/factories/SessionFactory.php',
         'Database\\Factories\\UserFactory' => __DIR__ . '/../..' . '/database/factories/UserFactory.php',
         'Database\\Factories\\VenueFactory' => __DIR__ . '/../..' . '/database/factories/VenueFactory.php',
         'Database\\Seeders\\ActivitySeeder' => __DIR__ . '/../..' . '/database/seeders/ActivitySeeder.php',
         'Database\\Seeders\\ActivityTypeSeeder' => __DIR__ . '/../..' . '/database/seeders/ActivityTypeSeeder.php',
+        'Database\\Seeders\\AttendanceSeeder' => __DIR__ . '/../..' . '/database/seeders/AttendanceSeeder.php',
         'Database\\Seeders\\DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeders/DatabaseSeeder.php',
         'Database\\Seeders\\EventSeeder' => __DIR__ . '/../..' . '/database/seeders/EventSeeder.php',
         'Database\\Seeders\\SessionAttendanceSeeder' => __DIR__ . '/../..' . '/database/seeders/SessionAttendanceSeeder.php',

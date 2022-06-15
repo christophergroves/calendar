@@ -165,7 +165,10 @@ $(document).ready(function() {
 
 
 
-{!! Form::open(array('action' => array('CalendarController@saveEdit','id'=>'calendar_edit_form', 'class'=>'form-horizontal','role'=>'form')) !!}
+
+
+{!! Form::open(array('class'=>'form-horizontal','role'=>'form')) !!}
+
 
 
     
