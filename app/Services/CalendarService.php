@@ -6,6 +6,9 @@ use App\Http\Resources\UserResource;
 use DateTime;
 use stdClass;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\Session;
+use App\Models\Activity;
 
 require_once app_path().'/Includes/constants/sql_constants.php';
 
@@ -101,6 +104,8 @@ public static function getMonth($user)
         endswitch;
         return $include;
     }
+
+
 
 
     private static function getEventsQuery($week_beginning, $week_ending, $user)
@@ -394,7 +399,20 @@ public static function getMonth($user)
 
 
 
+    public static function getActivitiesEditList($user)
+    {
 
+        $activities = Activity::select(DB::raw('CONCAT(activity_types.name," @ ",venues.name," - ",activities.description) AS name'), 'activities.id')
+            ->join('activity_types', 'activity_types.id', '=', 'activities.activity_type_id')
+            ->join('venues', 'venues.id', '=', 'activities.venue_id')
+            ->where('activities.user_id', $user->id)
+            ->orderBy('activity_types.list_position')
+            ->pluck('name', 'id')->all();
+
+        $activities = [''=>'Please select an activity ...'] + ['Activities List For '.$user->name.':' => $activities];
+
+        return $activities;
+    }
 
 
 

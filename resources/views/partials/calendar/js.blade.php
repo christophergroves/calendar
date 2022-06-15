@@ -74,17 +74,17 @@
                         return false;
                     }else{
                         let request = {};
-                        request.url = url + '/calendar/edit/dialog/content/';
+                        request.url = url + '/api/sessions/edit/dialog/content';
+                        request.dataType = 'html';
+                        request.type = 'GET';
                         request.data = {
                             'userId': userId,
                             'action': 'edit-new',
                             'sessionDate': date2mysql(date),
-                            'activityId': 0,
+                            'activityId': null,
+                            'sessionId': null,
 
                         };
-
-
-                        
                         openCalendarNewSessionDialog(request,date);  
                     }
                     
@@ -100,22 +100,9 @@
             // Get Events       
             events: function(start, end, timezone, callback) {
 
-                // let request = {};
-                // request.url = url + '/api/sessions/content';
-                // request.type = 'GET';
-                // request.dataType = 'JSON'
-                // request.data = {
-                //     "userId": userId,
-                //     "start":date2mysql(start),
-                //     "end": date2mysql(end),
-                // };
-
-                // sendRequest(request,parseEvents,callback);
-
-
-
                 $.ajax({
                     url: url + '/api/sessions/content',
+                    dataType: 'JSON',
                     data: data = {
                         "userId": userId,
                         "start":date2mysql(start),
@@ -124,9 +111,9 @@
                     success: function(returnedData) {
                         callback(returnedData.events);
                     },
-                    error: function(xhr, textStatus, errorThrown) {
-                        callback(xhr + ' ' + errorThrown);
-                    }
+                    // error: function(xhr, textStatus, errorThrown) {
+                    //     // callback(xhr + ' ' + errorThrown);
+                    // }
                 });
             },
 

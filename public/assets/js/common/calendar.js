@@ -35,7 +35,7 @@ function calendarGetEvents(userId, start, end, timezone, callback, urlLoadEvents
 
 
 
-function sendRequest(request,callback){
+function sendRequest(request,item,callback){
 
     $.ajax({
         type: request.type,
@@ -45,11 +45,12 @@ function sendRequest(request,callback){
 
     success: function(returnedData) {
         // $('#'+calendarID).fullCalendar( 'refetchEvents' );
-        callback(returnedData)
+        callback(returnedData,item)
+        // return returnedData;
         // parseEvents(returnedData,callback)
     },
     error: function(xhr, textStatus, errorThrown) {
-        callback(xhr + ' ' + errorThrown);
+        // callback(xhr + ' ' + errorThrown);
     }
     });
 };
@@ -394,17 +395,27 @@ function openCalendarEditSessionDialog(calEvent, jsEvent, view, url){
 }
 
 
+function formLoadHtml(html,formBody){
+    formBody.html(html);
+}
+
+
+
+
+
 function openCalendarNewSessionDialog(request,date){
 
     // sessionDate = date2mysql(date);
-    var urlLoad = url + '/calendar/edit/dialog/content/' + srvUsrId + '/' + 0 + '/edit-new' + '/' + sessionDate + '/' + activityId;
+    var urlLoad = request.url + request.data.userId + '/' + 0 + '/edit-new' + '/' + request.data.sessionDate + '/' + request.data.activityId;
 
     var formBody = $('<div id="allHtml"></div>');
+    sendRequest(request,formBody,formLoadHtml);
 
-    formBody.load(request.url, function(response,textStatus){
-                    if(response === 'Name Missmatch'){location.reload();}
-                    if(textStatus === 'error'){redirectToLogin(url);}
-                });
+
+    // formBody.load(urlLoad, function(response,textStatus){
+    //                 if(response === 'Name Missmatch'){location.reload();}
+    //                 if(textStatus === 'error'){redirectToLogin(url);}
+    //             });
 
     
     calendarEditSessionDialog = new BootstrapDialog({
