@@ -100,6 +100,20 @@
             // Get Events       
             events: function(start, end, timezone, callback) {
 
+                // let request = {};
+                // request.url = url + '/api/sessions/content';
+                // request.type = 'GET';
+                // request.dataType = 'JSON'
+                // request.data = {
+                //     "userId": userId,
+                //     "start":date2mysql(start),
+                //     "end": date2mysql(end),
+                // };
+
+                // sendRequest(request,parseEvents,callback);
+
+
+
                 $.ajax({
                     url: url + '/api/sessions/content',
                     data: data = {
@@ -108,7 +122,7 @@
                         "end": date2mysql(end),
                     },
                     success: function(returnedData) {
-                        callback(returnedData.events)
+                        callback(returnedData.events);
                     },
                     error: function(xhr, textStatus, errorThrown) {
                         callback(xhr + ' ' + errorThrown);
@@ -127,9 +141,9 @@
 		});     
 	});
 
-    function callbackEvents(data){
-        console.log(data.events);
-        callback_events(data.events);
+    function parseEvents(data,callback){
+       
+        // callback(data.events);
     }
 
 </script>

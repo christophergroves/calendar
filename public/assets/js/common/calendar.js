@@ -35,16 +35,18 @@ function calendarGetEvents(userId, start, end, timezone, callback, urlLoadEvents
 
 
 
-function sendRequest(request,callback){
+function sendRequest(request,parseEvents,callback){
 
     $.ajax({
         type: request.type,
         url: request.url,
         data: request.data,
-    
+        dataType: request.dataType,
+
     success: function(returnedData) {
         // $('#'+calendarID).fullCalendar( 'refetchEvents' );
-        callback(returnedData)
+        // callback(returnedData,callback)
+        parseEvents(returnedData,callback)
     },
     error: function(xhr, textStatus, errorThrown) {
         callback(xhr + ' ' + errorThrown);
@@ -395,13 +397,11 @@ function openCalendarEditSessionDialog(calEvent, jsEvent, view, url){
 function openCalendarNewSessionDialog(request,date){
 
     // sessionDate = date2mysql(date);
-    // var urlLoad = url + '/calendar/edit/dialog/content/' + srvUsrId + '/' + 0 + '/edit-new' + '/' + sessionDate + '/' + activityId;
+    var urlLoad = url + '/calendar/edit/dialog/content/' + srvUsrId + '/' + 0 + '/edit-new' + '/' + sessionDate + '/' + activityId;
 
     var formBody = $('<div id="allHtml"></div>');
-    
-    // formBody.load(request.url,{ "choices[]": [ "Jon", "Susan" ] });
-    
-    formBody.load(request.url,request.data, function(response,textStatus){
+
+    formBody.load(request.url, function(response,textStatus){
                     if(response === 'Name Missmatch'){location.reload();}
                     if(textStatus === 'error'){redirectToLogin(url);}
                 });
