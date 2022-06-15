@@ -142,8 +142,12 @@
 	});
 
     function parseEvents(data,callback){
-       
         // callback(data.events);
+    }
+
+
+    function refreshCalendar(){
+        $('#calendar').fullCalendar( 'refetchEvents' );
     }
 
 </script>

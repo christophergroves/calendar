@@ -35,7 +35,7 @@ function calendarGetEvents(userId, start, end, timezone, callback, urlLoadEvents
 
 
 
-function sendRequest(request,parseEvents,callback){
+function sendRequest(request,callback){
 
     $.ajax({
         type: request.type,
@@ -45,8 +45,8 @@ function sendRequest(request,parseEvents,callback){
 
     success: function(returnedData) {
         // $('#'+calendarID).fullCalendar( 'refetchEvents' );
-        // callback(returnedData,callback)
-        parseEvents(returnedData,callback)
+        callback(returnedData)
+        // parseEvents(returnedData,callback)
     },
     error: function(xhr, textStatus, errorThrown) {
         callback(xhr + ' ' + errorThrown);
