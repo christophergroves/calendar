@@ -64,7 +64,7 @@ class SiteService
             return $valid;
         });
 
-        /*=========================== UK Nat Ins Number ==================================>*/
+        /*=========================== Unique learner Number ==================================>*/
         //extend the validator class to force input into AA 00 00 00 Z
         Validator::extend('unique_learner_no', function ($attribute, $value, $parameters) {
             $valid = false;
@@ -148,67 +148,6 @@ class SiteService
         });
 
 
-        /*=========================== Alpha Num ==================================>*/
-        Validator::extend('alpha_number', function ($attribute, $value, $parameters) {
-            $valid = false;
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            if (ctype_alnum($value)) 
-            {
-                $valid = true;
-            } 
-            return $valid;
-        });
-
-
-
-        /*=========================== Alpha Num Plus ==================================>*/
-        Validator::extend('alpha_num_plus', function ($attribute, $value, $parameters) {
-            $valid = false;
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            // \xc2\xa0 deals with problem character Â
-            if (preg_match("#^[A-Z0-9-,_:;!&@£%=–’`é‘\s\+\*\.\?\/\(\)\[\]\{\}\#\'\"\xc2\xa0]+$#i", $value)) 
-            {
-                $valid = true;
-            }
-            return $valid;
-        });
-
-        /*=========================== Alpha Hyphen ==================================>*/
-        Validator::extend('alpha_hyphen', function ($attribute, $value, $parameters) {
-            $valid = false;
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            if (preg_match('#^[A-Z- ]+$#i', $value)) 
-            {
-                $valid = true;
-            }
-
-            return $valid;
-        });
-
-        /*=========================== Alpha name ==================================>*/
-        Validator::extend('alpha_name', function ($attribute, $value, $parameters) {
-            $valid = false;
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            if (preg_match('#^[A-Z-\' ]+$#i', $value)) 
-            {
-                $valid = true;
-            }
-
-            return $valid;
-        });
-
         /*=========================== Time ==================================>*/
         Validator::extend('time', function ($attribute, $value, $parameters) {
             $valid = false;
@@ -227,7 +166,6 @@ class SiteService
         //set message for the validation rules
         $message_text = [
             'required' => 'required field',
-            'date_format_uk' => 'Invalid date/format',
             'time' => 'hh:mm 24hr format only',
             'alpha' => 'Letters only',
             'alpha_num' => 'Letters, numbers only',

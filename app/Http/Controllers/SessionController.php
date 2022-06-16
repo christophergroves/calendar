@@ -58,7 +58,7 @@ class SessionController extends Controller
      */
     public function store(StoreSessionRequest $request)
     {
-        //
+        dd($request->all());
     }
 
     /**
@@ -194,9 +194,7 @@ class SessionController extends Controller
 
         $recurrance_types = [0 =>'None (Once on Session Date)', 1 =>'Weekly', 2 =>'Monthly'];
         $recurrance_days = [1 => 'mon', 2 => 'tue', 3 => 'wed', 4 => 'thu', 5 => 'fri', 6 => 'sat', 7 => 'sun'];
-
-        $start_date_label = 'Start date';
-
+        
         $session_date = DateTime::createFromFormat('Y-m-d', $request['sessionDate']);
 
         $recurrance_monthly_intervals = [
@@ -295,7 +293,7 @@ class SessionController extends Controller
             ->with('hours', $hours)
             ->with('edit_action', $request['action'])
             ->with('session_date', $session_date->format('Y-m-d'))
-            ->with('start_date_label', $start_date_label)
+            ->with('start_date_label', 'Start date')
             ->with('edit_dialog_title', $edit_dialog_title)
             ->with('errors',$errors)
             ->with('disabled_elements', $disabled_elements)

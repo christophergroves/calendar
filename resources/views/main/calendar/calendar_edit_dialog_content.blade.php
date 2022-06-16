@@ -167,12 +167,8 @@ $(document).ready(function() {
 
 
 
-{!! Form::open(array('class'=>'form-horizontal','role'=>'form')) !!}
+{!! Form::open(array('id'=>'calendar_edit_form','class'=>'form-horizontal','role'=>'form')) !!}
 
-
-
-    
-    {!! Form::hidden('user_id', $user->id, array('id' => 'user_id')); !!}
 
     <div class="form-group">
         {!! Form::label('activity_id_label','Activity',array('class'=>'col-xs-4 control-label')); !!}

@@ -44,13 +44,11 @@ function sendRequest(request,item,callback){
         dataType: request.dataType,
 
     success: function(returnedData) {
-        // $('#'+calendarID).fullCalendar( 'refetchEvents' );
         callback(returnedData,item)
-        // return returnedData;
-        // parseEvents(returnedData,callback)
     },
     error: function(xhr, textStatus, errorThrown) {
-        // callback(xhr + ' ' + errorThrown);
+        if(textStatus === 'error'){redirectToLogin(url);}
+        callback(xhr +' '+textStatus+' '+ errorThrown);
     }
     });
 };
@@ -403,19 +401,28 @@ function formLoadHtml(html,formBody){
 
 
 
+
+
+
+function convertFormToJSON(form) {
+    return $(form)
+      .serializeArray()
+      .reduce(function (json, { name, value }) {
+        json[name] = value;
+        return json;
+      }, {});
+  }
+  
+
+
+
+
 function openCalendarNewSessionDialog(request,date){
-
-    // sessionDate = date2mysql(date);
-    var urlLoad = request.url + request.data.userId + '/' + 0 + '/edit-new' + '/' + request.data.sessionDate + '/' + request.data.activityId;
-
+    
     var formBody = $('<div id="allHtml"></div>');
+    var url = request.url;
+    request.url = url + '/api/sessions/edit/dialog/content';
     sendRequest(request,formBody,formLoadHtml);
-
-
-    // formBody.load(urlLoad, function(response,textStatus){
-    //                 if(response === 'Name Missmatch'){location.reload();}
-    //                 if(textStatus === 'error'){redirectToLogin(url);}
-    //             });
 
     
     calendarEditSessionDialog = new BootstrapDialog({
@@ -448,7 +455,33 @@ function openCalendarNewSessionDialog(request,date){
             var sessionDate  = date2mysql(date);
             var data = $('#calendar_edit_form').serialize();
             var calendarID = 'calendar';
+
+
+            request.url = url + '/api/session/edit/store';
+            request.dataType = 'JSON';
+            request.type = 'PUT';
+           
+
+            var formData = convertFormToJSON('#calendar_edit_form');
+            $.extend(request.data, formData);
+            sendRequest(request,null,refreshCalendar);
+        
+            console.log(request);
+            return;
+   
+
+
+    
+
+
+
             var urlSave = url + '/calendar/edit/save/' + srvUsrId + '/' + 0 + '/edit-new/' + sessionDate;
+
+
+
+
+
+
             dialog.close();
             postCalendarDialogform(urlSave, calendarID, dialog, data);
             }

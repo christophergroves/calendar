@@ -1,6 +1,6 @@
 <script type="text/javascript">
         
-    var url = "{!! URL::to('') !!}";
+    var urlBase = "{!! URL::to('') !!}";
 
     var editSessionDialog = false;
     var transportDetailsDialog = false
@@ -74,8 +74,9 @@
                         return false;
                     }else{
                         let request = {};
-                        request.url = url + '/api/sessions/edit/dialog/content';
-                        request.dataType = 'html';
+                        // request.url = url + '/api/sessions/edit/dialog/content';
+                        request.url = urlBase; 
+                        request.dataType = 'HTML';
                         request.type = 'GET';
                         request.data = {
                             'userId': userId,
@@ -101,7 +102,7 @@
             events: function(start, end, timezone, callback) {
 
                 $.ajax({
-                    url: url + '/api/sessions/content',
+                    url: urlBase + '/api/sessions/content',
                     dataType: 'JSON',
                     data: data = {
                         "userId": userId,
