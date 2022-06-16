@@ -428,8 +428,8 @@ public static function getMonth($user)
         $session->session_day = $actual_start_date->format('N');
         $session->start_date = $actual_start_date->format('Y-m-d');
         $session->finish_date = $actual_start_date->format('Y-m-d');
-        $session->start_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['start_time']));
-        $session->finish_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['finish_time']));
+        $session->start_time = SiteService::setNullIfEmptyOrFalse($request['start_time']);
+        $session->finish_time = SiteService::setNullIfEmptyOrFalse($request['start_time']);
         $session->hours = $request['hours'] ? $request['hours'] : 4;
         $session->updated_by = $staff->id;
         $session->save();
@@ -490,8 +490,8 @@ public static function getMonth($user)
         $session->session_day = DateTime::createFromFormat('d/m/Y', $request['session_date'])->format('N');
         $session->start_date = SiteService::dmy2mysql($request['session_date']);
         $session->finish_date = SiteService::dmy2mysql($request['session_date']);
-        $session->start_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['start_time']));
-        $session->finish_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['finish_time']));
+        $session->start_time = SiteService::setNullIfEmptyOrFalse($request['start_time']);
+        $session->finish_time = SiteService::setNullIfEmptyOrFalse($request['start_time']);
         $session->hours = $request['hours'] !== '' ? $request['hours'] : 4;
         $session->updated_by = $user->id;
         $session->save();
@@ -648,8 +648,8 @@ public static function getMonth($user)
 
             $session->recurrance_monthly_interval = null;
             $session->session_day = $day_no;
-            $session->start_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['start_time']));
-            $session->finish_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['finish_time']));
+            $session->start_time = SiteService::setNullIfEmptyOrFalse($request['start_time']);
+            $session->finish_time = SiteService::setNullIfEmptyOrFalse($request['start_time']);
             $session->hours = $request['hours'] !== '' ? $request['hours'] : 4;
             $session->updated_by = $user->id;
             $session->save();

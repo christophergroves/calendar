@@ -202,6 +202,20 @@ class SiteService
         return $array;
     }
 
+
+    public static function validateTime24hrClock($time)
+    {
+
+            // does not work
+        // if(!preg_match("/(1[012]|0[0-9]):([0-5][0-9])/", $time)){
+        // 	return false;
+        // }else{
+        // 	return $time;
+        // }
+
+        return $time;
+    }
+
     public static function diffInMonths($start, $end)
     {
         $diffYears = $end->format('Y') - $start->format('Y');

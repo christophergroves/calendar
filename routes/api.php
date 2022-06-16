@@ -24,20 +24,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::put('/store', [ActivityController::class, 'store']);
-
-
-
 Route::get('/sessions/content', [SessionController::class, 'content']);
-
-
 Route::get('/session/edit/dialog/content', [SessionController::class, 'getEditDialogContent']);
-
-
-
-
 Route::put('/session/edit/store', [SessionController::class, 'store']);
+
+Route::put('activity/store', [ActivityController::class, 'store']);
 
 
 

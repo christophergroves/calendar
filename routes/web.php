@@ -22,7 +22,8 @@ use App\Http\Controllers\TestCodeController;
 
 
 Route::get('/', function () {
-    return view('main.front_test');
+    // return view('main.front_test');
+    return redirect('/calendar');
 });
 
 
