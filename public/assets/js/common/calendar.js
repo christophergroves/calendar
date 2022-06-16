@@ -35,23 +35,7 @@ function calendarGetEvents(userId, start, end, timezone, callback, urlLoadEvents
 
 
 
-function sendRequest(request,item,callback){
 
-    $.ajax({
-        type: request.type,
-        url: request.url,
-        data: request.data,
-        dataType: request.dataType,
-
-    success: function(returnedData) {
-        callback(returnedData,item)
-    },
-    error: function(xhr, textStatus, errorThrown) {
-        if(textStatus === 'error'){redirectToLogin(url);}
-        callback(xhr +' '+textStatus+' '+ errorThrown);
-    }
-    });
-};
 
 
 
@@ -412,6 +396,32 @@ function convertFormToJSON(form) {
         return json;
       }, {});
   }
+
+
+  function refreshCalendar(response){
+    if(response !== 'error'){
+        $('#calendar').fullCalendar( 'refetchEvents' );
+    }
+}
+
+
+function sendRequest(request,item,callback){
+
+    $.ajax({
+        type: request.type,
+        url: request.url,
+        data: request.data,
+        dataType: request.dataType,
+
+    success: function(returnedData) {
+        callback(returnedData,item);
+    },
+    error: function(xhr, textStatus, errorThrown) {
+        callback(textStatus);
+    }
+    });
+}
+
   
 
 
@@ -452,38 +462,22 @@ function openCalendarNewSessionDialog(request,date){
             $("#calendar_edit_form").bootstrapValidator('validate');
             if(!$("#calendar_edit_form").data('bootstrapValidator').isValid()) {return false;}
                 
-            var sessionDate  = date2mysql(date);
-            var data = $('#calendar_edit_form').serialize();
-            var calendarID = 'calendar';
+            // var sessionDate  = date2mysql(date);
+            // var data = $('#calendar_edit_form').serialize();
+            // var calendarID = 'calendar';
 
 
             request.url = url + '/api/session/edit/store';
             request.dataType = 'JSON';
             request.type = 'PUT';
            
-
             var formData = convertFormToJSON('#calendar_edit_form');
             $.extend(request.data, formData);
+
             sendRequest(request,null,refreshCalendar);
-        
-            console.log(request);
-            return;
-   
-
-
-    
-
-
-
-            var urlSave = url + '/calendar/edit/save/' + srvUsrId + '/' + 0 + '/edit-new/' + sessionDate;
-
-
-
-
-
 
             dialog.close();
-            postCalendarDialogform(urlSave, calendarID, dialog, data);
+            // postCalendarDialogform(urlSave, calendarID, dialog, data);
             }
         },{
             label: 'Cancel',

@@ -10,10 +10,6 @@ class Session extends Model
     use HasFactory;
 
 
-
-
-
-
     /**
      * Get the attendance for this session.
      */
@@ -23,9 +19,6 @@ class Session extends Model
     }
 
 
-
-
-
     /**
      * Belongs to activity.
      */
@@ -33,4 +26,10 @@ class Session extends Model
     {
         return $this->belongsTo(Activity::class);
     }
+
+
+    protected $fillable = [
+        'activity_id',
+        'recurrance_type',
+    ];
 }

@@ -112,9 +112,9 @@
                     success: function(returnedData) {
                         callback(returnedData.events);
                     },
-                    // error: function(xhr, textStatus, errorThrown) {
-                    //     // callback(xhr + ' ' + errorThrown);
-                    // }
+                    error: function(xhr, textStatus, errorThrown) {
+                        callback(textStatus);
+                    }
                 });
             },
 
@@ -129,13 +129,11 @@
 		});     
 	});
 
-    function parseEvents(data,callback){
-        // callback(data.events);
-    }
 
-
-    function refreshCalendar(){
-        $('#calendar').fullCalendar( 'refetchEvents' );
+    function refreshCalendar(response){
+        if(response !== 'error'){
+            $('#calendar').fullCalendar( 'refetchEvents' );
+        }
     }
 
 </script>

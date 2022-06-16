@@ -58,8 +58,41 @@ class SessionController extends Controller
      */
     public function store(StoreSessionRequest $request)
     {
-        dd($request->all());
+        $request = $request->all();
+        $user = User::where('id',$request['userId'])->firstOrFail();
+
+
+  
+
+
+        if (! array_key_exists('recurrance_type', $request)) {
+            $request['recurrance_type'] = 0;
+        }
+
+        if ($request['action'] === 'edit-instance') {
+            CalendarService::saveInstance($request, $user);
+        } 
+        else 
+        {
+            switch ((int)$request['recurrance_type']) :
+            /*============================================ NO REPEATS ==================================================>*/
+            case 0:
+                    CalendarService::saveNoRepeats($request, $user, $changed_to_instance=false);
+            break;
+            /*============================================ REPEATS WEEKLY ==================================================>*/
+            case 1:
+                    // CalendarService::saveRepeatWeekly($input, $session_id, $edit_action, $session_date, $staff, $service_user);
+            break;
+            /*============================================ REPEATS MONTHLY ==================================================>*/
+            case 2:
+                    // CalendarService::saveRepeatMonthly($input, $session_id, $edit_action, $session_date, $staff, $service_user);
+            break;
+            default:
+                    endswitch;
+        }
     }
+
+
 
     /**
      * Display the specified resource.

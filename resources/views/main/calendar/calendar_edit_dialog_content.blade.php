@@ -167,8 +167,9 @@ $(document).ready(function() {
 
 
 
-{!! Form::open(array('id'=>'calendar_edit_form','class'=>'form-horizontal','role'=>'form')) !!}
+{!! Form::open(array('id'=>'calendar_edit_form','class'=>'form-horizontal')) !!}
 
+    {!! Form::token(); !!}
 
     <div class="form-group">
         {!! Form::label('activity_id_label','Activity',array('class'=>'col-xs-4 control-label')); !!}

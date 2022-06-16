@@ -2,13 +2,16 @@
 
 namespace App\Services;
 
-use App\Http\Resources\UserResource;
 use DateTime;
 use stdClass;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Session;
 use App\Models\Activity;
+use App\Helpers\SiteService;
+use App\Models\SessionAttendance;
+use Illuminate\Support\Facades\DB;
+use App\Http\Resources\UserResource;
+use Facade\FlareClient\Http\Response;
 
 require_once app_path().'/Includes/constants/sql_constants.php';
 
@@ -213,186 +216,6 @@ public static function getMonth($user)
 
 
 
-    public static function getReviews($params)
-    {
-        $join_status = false;
-        $service_ids = [];
-        $order_by = '';
-        $where = ' ';
-
-        /*======================= either one service_id or multiple service_ids =====================>*/
-        foreach ($params['service_id'] as $service_id) {
-            $service_ids[] = $service_id;
-        }
-        /*============================================================*/
-
-        if ($params['sort']) {
-            switch ($params['sort']) :
-          case 1: $order_by .= 'contacts.surname,contacts.firstname';
-            break;
-            case 2: $order_by .= 'staff.surname,staff.firstname';
-            break;
-            case 3: $order_by .= 'TSubSD.start_date DESC';
-            break;
-            case 4: $order_by .= 'TSubLD.leave_date DESC';
-            break;
-            case 5: $order_by .= 'contacts.surname,contacts.firstname'; // dummy sort because true sort happens later
-            break;
-            endswitch;
-            $order_by .= ',contacts.surname,contacts.firstname ';
-        }
-
-        $objectives_in_progress_count =
-        '(SELECT
-          Count(*) as objectives_count,
-          objectives.service_user_id
-          FROM
-          objectives
-          WHERE
-          objectives.objective_status_id = 3
-          GROUP BY objectives.service_user_id
-          ) AS objectives_count';
-
-        $service_user_start_date =
-        '(SELECT DISTINCT
-        status.service_user_id,
-        status.status_date AS start_date
-        FROM 
-        status
-        WHERE 
-        status.status_type_id IN (1)) AS TSubSD';
-
-        $service_user_leave_date =
-        '(SELECT DISTINCT
-        status.service_user_id,
-        status.status_date AS leave_date
-        FROM 
-        status
-        WHERE 
-        status.status_type_id IN (3,4)) AS TSubLD';
-
-        $service_users = ServiceUser::with('objective_reviews')
-          ->with('objectives')
-          ->with('follow_ups')
-
-          ->select(
-            'service_users.id',
-            'contacts.firstname',
-            'contacts.surname',
-            'TSubSD.start_date',
-            'TSubLD.leave_date',
-            'dates_misc.date_initial_action_plan',
-            'objectives_count.objectives_count',
-
-            DB::raw("CONCAT_WS(' ',service_names.service_name,service_areas.service_area) AS service_area"),
-            DB::raw("CONCAT_WS(' ',staff.firstname,staff.surname) AS staff")
-          )
-
-          ->join('contacts', function ($join) {
-              $join->on('contacts.service_user_id', '=', 'service_users.id');
-              $join->on('contacts.contact_type_id', '=', DB::raw('1'));
-          })
-
-          ->leftJoin(DB::raw($service_user_start_date), function ($join) {
-              $join->on('TSubSD.service_user_id', '=', 'contacts.service_user_id');
-          })
-
-          ->leftJoin(DB::raw($service_user_leave_date), function ($join) {
-              $join->on('TSubLD.service_user_id', '=', 'service_users.id');
-          })
-
-          ->join('service_users2services', function ($join) {
-              $join->on('service_users2services.service_user_id', '=', 'contacts.service_user_id');
-              $join->on('service_users2services.active', '=', DB::raw('1'));
-          })
-
-          ->join('services', 'services.id', '=', 'service_users2services.service_id')
-          ->join('service_areas', 'service_areas.id', '=', 'services.service_area_id')
-          ->join('service_names', 'service_names.id', '=', 'services.service_name_id')
-
-          ->leftJoin('service_users2staff', function ($join) {
-              $join->on('service_users2staff.service_user_id', '=', 'contacts.service_user_id');
-              $join->on('service_users2staff.active', '=', DB::raw('1'));
-          })
-
-          ->leftJoin('staff', 'staff.id', '=', 'service_users2staff.staff_id')
-
-          ->join('status', function ($join) {
-              $join->on('status.service_user_id', '=', 'contacts.service_user_id');
-              $join->on('status.active', '=', DB::raw('1'));
-          })
-
-          ->leftJoin('trust_areas', 'trust_areas.id', '=', 'service_users.trust_area_id')
-          ->leftJoin('trusts', 'trusts.id', '=', 'trust_areas.trust_id')
-          ->leftJoin('trust_regions', 'trust_regions.id', '=', 'trust_areas.trust_region_id')
-
-          ->leftJoin('dates_misc', 'dates_misc.service_user_id', '=', 'service_users.id')
-
-          ->leftJoin(DB::raw($objectives_in_progress_count), function ($join) {
-              $join->on('objectives_count.service_user_id', '=', 'service_users.id');
-          })
-
-          ->whereIn('service_users2services.service_id', $service_ids)
-          ->where('status.status_type_id', $params['status']);
-
-        /*================== This deals with the service grouping selections ===============>*/
-        if ($params['service_name_id']) {
-            $service_users = $service_users
-            ->where('services.service_name_id', '=', $params['service_name_id']);
-        }
-
-        if ($params['filter']) {
-            switch ($params['filter'][0]) :
-              case 'a':
-                $service_users = $service_users->where('trust_areas.id', substr($params['filter'], 1));
-            break;
-            case 't':
-                $service_users = $service_users->where('trusts.id', substr($params['filter'], 1));
-            break;
-            case 'p':
-                $service_users = $service_users->where('service_users2staff.staff_id', substr($params['filter'], 1));
-            break;
-            endswitch;
-        }
-
-        if ($params['staff_id']) {
-            $service_users = $service_users->where('service_users2staff.staff_id', $params['staff_id']);
-        }
-
-        $service_users = $service_users
-
-          ->groupBy('service_users.id')
-
-          ->orderByRaw($order_by)
-
-          ->get();
-
-        // This portion is purely so that we can sort by 'review_due' (which is added after collection from db)
-        if ((int) $params['status'] === 1) {
-            foreach ($service_users as $service_user) {
-                $review_due = false;
-                foreach ($service_user->objective_reviews as $review) {
-                    $review_due = $review->review_date;
-                }
-                if ($review_due) {
-                    $review_due = DateTime::createFromFormat('Y-m-d', $review_due);
-                    $review_due->modify('+6 Month');
-                } elseif ($service_user->date_initial_action_plan) {
-                    $review_due = DateTime::createFromFormat('Y-m-d', $service_user->date_initial_action_plan);
-                    $review_due->modify('+6 Month');
-                }
-                $service_user->review_due = $review_due ? $review_due->format('Y-m-d') : null;
-            }
-        }
-
-        // Do the actual sort in the elequent collection object
-        if ($params['sort'] === '5' && (int) $params['status'] === 1) {
-            $service_users = $service_users->sortByDesc('review_due');
-        }
-
-        return $service_users;
-    }
-
 
 
 
@@ -415,12 +238,530 @@ public static function getMonth($user)
     }
 
 
+    public static function saveInstance($request, $user)
+    {
+
+        dd('save instance');
+        $day_date = false;
+        $start_date_monthly = false;
+
+        // get session details filtered by service user id
+        $session_orig = Session::select('sessions.*')
+            ->where('sessions.id', $request['sessionId'])
+            ->whereUserId($user->id)
+            ->join('activities', 'activities.id', '=', 'sessions.activity_id')
+            ->first();
+
+        $session = Session::whereid($session_orig->id)->first();
+
+        // $session = clone $session_orig;
+
+        $input_orig['recurrance_number'] = $session_orig->recurrance_number;
+        $input_orig['recurrance_type'] = $session_orig->recurrance_type;
+        $input_orig['recurrance_interval'] = $session_orig->recurrance_interval;
+        $input_orig['recurrance_monthly_interval'] = $session_orig->recurrance_monthly_interval;
+        $input_orig['recurrance_day_single'] = $session_orig->session_day;
+
+        // get session date from parameter (date clicked) and session_date from form element
+        // $session_date_form = DateTime::createFromFormat('d/m/Y', $request['session_date']);
+        $session_date_param = DateTime::createFromFormat('Y-m-d', $request['sessionDate']);
+        $session_date_form = array_key_exists('session_date', $request) ? DateTime::createFromFormat('d/m/Y', $request['sessionDate']) : $session_date_param;
+        $start_date_form = array_key_exists('start_date', $request) ? DateTime::createFromFormat('d/m/Y', $request['start_date']) : $session_date_param;
+
+        switch ((int) $session->recurrance_type) :
+            case 0:
+            break;
+        // weekly repeat
+        case 1:
+                // if no days checkboxes are checked then get day from session date
+            if (! array_key_exists('recurrance_day', $request)) 
+            {
+                $request['recurrance_day'][0] = DateTime::createFromFormat('d/m/Y', $request['sessionDate'])->format('N');
+            }
+            // is there more than one day checked?
+            if (count($request['recurrance_day']) > 1) 
+            {
+                echo 'Error! Only one day allowed to be checked!';
+                return false;
+            }
+        // get the day number
+        foreach ($request['recurrance_day'] as $day) 
+        {
+            if ($day) 
+            {
+                $day_no = $day;
+            }
+        }
+        // get actual date of checked day
+        $diff = $day_no - $session_date_param->format('N');
+        $day_date = clone $session_date_param;
+        $day_date->modify($diff.' Day');
+        break;
+        // monthly repeat
+        case 2:
+        // correct to get actual start date (i.e. first monday of August)
+        $recurrance_days = [1 => 'mon', 2 => 'tue', 3 => 'wed', 4 => 'thu', 5 => 'fri', 6 => 'sat', 7 => 'sun'];
+        $start_date_monthly = clone $session_date_param;
+        $start_date_monthly->modify($request['recurrance_monthly_interval'].' '.$recurrance_days[$request['recurrance_day_single']].' of '.$start_date_monthly->format('M'));
+        break;
+        endswitch;
+
+        // switch to find out which date to set for the start date
+        switch (true) :
+            case $session_date_param->format('Y-m-d') !== $session_date_form->format('Y-m-d'):  // if session date on form has changed
+                // take the date from the session date on form
+                $actual_start_date = $session_date_form;
+        break;
+        case $session->start_date !== $start_date_form->format('Y-m-d'):  // if start date on form has changed
+                // take the date from the start date on form
+                $actual_start_date = $start_date_form;
+        break;
+        case $day_date && $day_date->format('Y-m-d') !== $start_date_form->format('Y-m-d'): // if day checkbox has changed
+                // take the date from the day checkbox
+                $actual_start_date = $day_date;
+        break;
+        case $start_date_monthly && $start_date_monthly->format('Y-m-d') !== $session_date_param->format('Y-m-d'):
+                $actual_start_date = $start_date_monthly;
+        break;
+        default:
+                // else leave date as it was
+                $actual_start_date = $session_date_param;
+        endswitch;
 
 
 
 
 
+        // set 'session_deleted' flag on attendance table to flag this session on this session date is to be ommited but only if it is a recurring session.
+        if (! $session->parent_id) {
+            $attendance = SessionAttendance::whereSession_id($session->id)->whereAbsence_date($request['session_date'])->first();
+            if (! $attendance) {
+                $attendance = new SessionAttendance;
+            }
+            $attendance->session_id = $session->id;
+            $attendance->absence_date = $session_date_param->format('Y-m-d');
+            $attendance->updated_by = $user->id;
+            $attendance->session_deleted = 1;
+            $attendance->save();
+        }
 
+        // if session is child then get parent and session model
+        if ($session->parent_id) {
+            $session_parent = DB::table('sessions')->whereId($session->parent_id)->first();
+        } else {
+            $date_correction = self::correctStartFinishDateCleanUpDeletes($session_orig, $input_orig, $session_date_param);
+
+            if ($date_correction) {
+                if ($date_correction['start_date']) {
+                    $session->start_date = $date_correction['start_date']->format('Y-m-d');
+
+                    if ($session_orig->finish_date === $date_correction['start_date']->format('Y-m-d')) {
+                        $session->recurrance_type = 0;
+                    }
+                } elseif ($date_correction['finish_date']) {
+                    $session->finish_date = $date_correction['finish_date']->format('Y-m-d');
+
+                    if ($session_orig->start_date === $date_correction['finish_date']->format('Y-m-d')) {
+                        $session->recurrance_type = 0;
+                    }
+                }
+
+                $session->recurrance_number = null;
+                $session->ends_on = 2;
+                $session->updated_by = $staff->id;
+                $session->save();
+            }
+            $session_parent = $session;
+            $session = new SessionModel;
+        }
+
+        if (! $session) {
+            $session = new SessionModel;
+        }
+        $session->fill($request); //mass fill
+        if ($session_parent) {
+            $session->parent_id = $session_parent->id;
+        }
+        $session->recurrance_type = 0;
+        $session->recurrance_number = null;
+        $session->recurrance_interval = null;
+        $session->recurrance_monthly_interval = null;
+        $session->session_day = $actual_start_date->format('N');
+        $session->start_date = $actual_start_date->format('Y-m-d');
+        $session->finish_date = $actual_start_date->format('Y-m-d');
+        $session->start_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['start_time']));
+        $session->finish_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['finish_time']));
+        $session->hours = $request['hours'] ? $request['hours'] : 4;
+        $session->updated_by = $staff->id;
+        $session->save();
+
+
+        // if a new session has been created then copy the attendance over to this new session
+        if ($session_orig && (int) $session_orig->id !== (int) $session->id) {
+            self::transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff);
+        }
+    }
+
+
+
+    public static function saveNoRepeats($request, $user, $changed_to_instance)
+    {
+        
+
+        if ($request['sessionId']) {
+            $session_orig = Session::select('sessions.id')
+            ->where('sessions.id', $request['sessionId'])
+            ->whereUser_id($user->id)
+            ->join('activities', 'activities.id', '=', 'sessions.activity_id')
+            ->first();
+
+         
+            $session_orig = Session::whereId($session_orig->id)->first();
+
+            $session_orig_start_date = DateTime::createFromFormat('Y-m-d', $session_orig->start_date);
+            $session_date_param = DateTime::createFromFormat('Y-m-d', $request['sessionDate']);
+
+            // If changed to an instance from weekly/monthly then check if it is the first one of the series
+            if ($changed_to_instance === '1' && ($session_orig_start_date->format('Y-m-d') !== $session_date_param->format('Y-m-d'))) 
+            {
+                $request['recurrance_type'] === $session_orig->recurrance_type;
+                $session_orig = self::finishOffExistingRecurringSet($session_date_param, $session_orig, $request); // finish off old
+                $session_orig->save();
+                $session = $session_orig->replicate(); // create a new one based on the finished off one
+            } 
+            else 
+            {
+                $session = $session_orig;
+            }
+        } 
+        else 
+        {
+            $session = new Session;
+        }
+
+        $session->fill($request); //mass fill
+        $session->recurrance_number = null;
+        $session->ends_on = 0;
+        $session->recurrance_interval = null;
+        $session->recurrance_monthly_interval = null;
+        $session->session_day = DateTime::createFromFormat('d/m/Y', $request['session_date'])->format('N');
+        $session->start_date = SiteService::dmy2mysql($request['session_date']);
+        $session->finish_date = SiteService::dmy2mysql($request['session_date']);
+        $session->start_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['start_time']));
+        $session->finish_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['finish_time']));
+        $session->hours = $request['hours'] !== '' ? $request['hours'] : 4;
+        $session->updated_by = $user->id;
+        $session->save();
+
+
+        return response('success',200);
+    }
+
+
+    private static function correctStartFinishDateCleanUpDeletes($session_orig, $input, $session_date_drag_start, $session_date_at_drop = false, $remove_action = false)
+    {
+        $possible_delete_date = false;
+        $date_correction = ['start_date'=>false, 'finish_date'=>false];
+        $possible_deletes = [];
+        $deletes_found = [];
+        $recurrance_interval = $input['recurrance_interval'];
+        $session_orig_start_date = $session_orig->start_date;
+        $recurrance_days = [1 => 'mon', 2 => 'tue', 3 => 'wed', 4 => 'thu', 5 => 'fri', 6 => 'sat', 7 => 'sun'];
+
+        // $possible_delete_date = $session_orig->finish_date ?  DateTime::createFromFormat('Y-m-d', $session_orig->finish_date) : false;
+
+        // This is to fix the issue where if there is no finish date and the first in the series is deleted the new start date does not correct. Also if the last in the series is deleted then the start date does not correct.
+        if (
+            $remove_action === 'delete-instance' &&
+            ((int) $session_orig->recurrance_type === 1 || (int) $session_orig->recurrance_type === 2) &&
+            $session_date_drag_start->format('Y-m-d') === $session_orig->start_date) 
+        {
+            $term = (int) $session_orig->recurrance_type === 1 ? 'WEEK' : 'MONTH';
+            $possible_delete_date = $session_orig->finish_date ? DateTime::createFromFormat('Y-m-d', $session_orig->finish_date) : DateTime::createFromFormat('Y-m-d', $session_orig->start_date)->modify('+'.$recurrance_interval * 104 .' '.$term);
+        } 
+        elseif (
+            $remove_action === 'delete-instance' &&
+            ((int) $session_orig->recurrance_type === 1 || (int) $session_orig->recurrance_type === 2) &&
+            $session_date_drag_start->format('Y-m-d') === $session_orig->finish_date) 
+        {
+            $possible_delete_date = $session_orig->finish_date ? DateTime::createFromFormat('Y-m-d', $session_orig->finish_date) : false;
+        }
+
+        if (! $possible_delete_date) 
+        {
+            return false;
+        }
+
+        if ((int) $session_orig->recurrance_type === 1) 
+        {
+
+            // step through possible delete dates and store them in $possible_deletes
+            for ($i = 1; $i <= 150; $i++) 
+            {
+                $possible_deletes[] = $possible_delete_date->format('Y-m-d');
+                $possible_delete_date->modify('-'.$recurrance_interval.' Week');
+
+                // if we overshoot the start date then break
+                if ($possible_delete_date->format('Y-m-d') < $session_orig_start_date) 
+                {
+                    break;
+                }
+            }
+        } 
+        elseif ((int) $session_orig->recurrance_type === 2) 
+        {
+
+            // step through possible delete dates and store them in $possible_deletes
+            for ($i = 1; $i <= 150; $i++) 
+            {
+                $possible_deletes[] = $possible_delete_date->format('Y-m-d');
+                $possible_delete_date->modify('first day of this month');
+                $possible_delete_date->modify('- '.$input['recurrance_interval'].' Month');
+                $possible_delete_date->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$possible_delete_date->format('M'));
+
+                // if we overshoot the start date then break
+                if ($possible_delete_date->format('Y-m-d') < $session_orig_start_date) 
+                {
+                    break;
+                }
+            }
+        }
+
+        // look for session dates that have been flagged as deleted
+        $deletes = DB::table('attendance')->select('id', 'absence_date')
+            ->where('session_id', $session_orig->id)
+            ->where('session_deleted', 1)
+            ->whereIn('absence_date', $possible_deletes)
+            ->orderBy('absence_date', 'DESC')
+            ->get();
+
+        // $deletes_found = array();
+        foreach ($deletes as $delete) 
+        {
+            $deletes_found[] = $delete->absence_date;
+        }
+
+        if (count($deletes_found) < 1) 
+        {
+            return $date_correction;
+        }
+
+        if (count($possible_deletes) === count($deletes_found)) 
+        {
+            $session = SessionModel::whereId($session_orig->id)->first();
+            $session->delete();
+
+            return $date_correction;
+        }
+
+        /*================= GOING BACK FROM THE FINISH DATE TO THE START DATE CORRECTING FINISH DATE AND DELETING ATTENDANCE SESSION DELETES ===============>*/
+
+        // if you are deleting the last event in a line of recurring events then go back until you find an active event occurance that has not been deleted
+        if ($session_orig->finish_date === $session_date_drag_start->format('Y-m-d')) 
+        {
+            switch ($session_orig->recurrance_type) :
+                    case 1: // Weelky
+
+                         $finish_date_correction = DateTime::createFromFormat('Y-m-d', $session_orig->finish_date);
+
+            // if the date at drop is one of the deleted dates then delete the attendance record on this date
+            if ($session_date_at_drop && in_array($session_date_at_drop->format('Y-m-d'), $deletes_found)) 
+            {
+                DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($session_date_at_drop->format('Y-m-d'))->delete();
+            }
+
+            // keep taking the finish date back while you still find events that have the deleted flag set
+            for ($i = 1; $i <= 150; $i++) 
+            {
+                if (in_array($finish_date_correction->format('Y-m-d'), $deletes_found)) {
+                    // keep taking the finish date back while you still find events that have the deleted flag set (weekly events)
+                    DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($finish_date_correction->format('Y-m-d'))->delete();
+                    $finish_date_correction->modify('-'.$recurrance_interval.' Week');
+                } 
+                else 
+                {
+                break;
+                }
+            }
+            break;
+
+            case 2: // Monthly
+
+                        $finish_date_correction = DateTime::createFromFormat('Y-m-d', $session_orig->finish_date)->modify('first day of this month');
+            $finish_date_correction->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$finish_date_correction->format('M'));
+
+            // if the date at drop is one of the deleted dates then delete the attendance record on this date
+            if ($session_date_at_drop && in_array($session_date_at_drop->format('Y-m-d'), $deletes_found)) {
+                DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($session_date_at_drop->format('Y-m-d'))->delete();
+            }
+
+            // keep taking the finish date back while you still find events that have the deleted flag set and deleting the appropriate attendance row (monthly events)
+            for ($i = 1; $i <= 150; $i++) 
+            {
+                if (in_array($finish_date_correction->format('Y-m-d'), $deletes_found)) {
+                    //delete the attendance row which matches this the date you have stepped back to at this point
+                    DB::table('attendance')->whereSession_id($session->id)->whereAbsence_date($finish_date_correction->format('Y-m-d'))->delete();
+                    $finish_date_correction->modify('first day of this month')->modify('-'.$recurrance_interval.' month');
+                    $finish_date_correction->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$finish_date_correction->format('M'));
+                } 
+                else 
+                {
+                break;
+                }
+            }
+            break;
+            default:
+                endswitch;
+
+            $date_correction['finish_date'] = $finish_date_correction;
+        /*====================================================================================================================================================>*/
+
+        /*================= GOING FORWARDS FROM THE START DATE TO THE FINISH DATE CORRECTING START DATE AND DELETING ATTENDANCE SESSION DELETES ===============>*/
+
+        // if you are deleting the first event in a line of recurring events then go forwards until you find an active event occurance that has not been deleted
+        } 
+        elseif ($session_orig->start_date === $session_date_drag_start->format('Y-m-d')) 
+        {
+            switch ($session_orig->recurrance_type) :
+                    case 1: // Weelky
+
+                        $start_date_correction = DateTime::createFromFormat('Y-m-d', $session_orig->start_date);
+
+            // if the date at drop is one of the deleted dates then delete the attendance record on this date
+            if ($session_date_at_drop && in_array($session_date_at_drop->format('Y-m-d'), $deletes_found)) 
+            {
+                DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($session_date_at_drop->format('Y-m-d'))->delete();
+            }
+
+            // keep taking the finish date back while you still find events that have the deleted flag set
+            for ($i = 1; $i <= 150; $i++) 
+            {
+                if (in_array($start_date_correction->format('Y-m-d'), $deletes_found)) 
+                {
+                    // keep taking the start date forwards while you still find events that have the deleted flag set (weekly events)
+                    // delete the attendance row which matches the date you have stepped forward to at this point
+                    DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($start_date_correction->format('Y-m-d'))->delete();
+                    $start_date_correction->modify('+'.$recurrance_interval.' Week');
+                } 
+                else 
+                {
+                break;
+                }
+            }
+            break;
+
+            case 2: // Monthly
+
+                    $start_date_correction = DateTime::createFromFormat('Y-m-d', $session_orig->start_date)->modify('first day of this month');
+            $start_date_correction->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$start_date_correction->format('M'));
+
+            // if the date at drop is one of the deleted dates then delete the attendance record on this date
+            if ($session_date_at_drop && in_array($session_date_at_drop->format('Y-m-d'), $deletes_found)) 
+            {
+                DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($session_date_at_drop->format('Y-m-d'))->delete();
+            }
+
+            // keep taking the start date forwards while you still find events that have the deleted flag set and deleting the appropriate attendance row (monthly events)
+            for ($i = 1; $i <= 150; $i++) 
+            {
+                if (in_array($start_date_correction->format('Y-m-d'), $deletes_found)) {
+                    // keep taking the start date forwards while you still find events that have the deleted flag set (weekly events)
+                    // delete the attendance row which matches the date you have stepped forward to at this point
+                    DB::table('attendance')->whereSession_id($session_orig->id)->whereAbsence_date($start_date_correction->format('Y-m-d'))->delete();
+                    $start_date_correction->modify('first day of this month')->modify('+'.$recurrance_interval.' month');
+                    $start_date_correction->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$start_date_correction->format('M'));
+                } 
+                else 
+                {
+                break;
+                }
+            }
+            break;
+            default:
+                endswitch;
+
+            $date_correction['start_date'] = $start_date_correction;
+            /*=================================================================================================================================>*/
+        }
+
+        return $date_correction;
+    }
+
+
+    public static function transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff)
+    {
+        $attendances = SessionAttendance::whereSession_id($session_orig->id)->whereNotNull('absence')->get();
+
+        foreach ($attendances as $attendance) {
+            $attendance_new = $attendance->replicate();
+            $attendance_new->session_deleted = null;
+            $attendance_new->session_id = $session->id;
+            $attendance_new->updated_by = $staff->id;
+            $attendance_new->save();
+        }
+    }
+
+
+
+    private static function finishOffExistingRecurringSet($session_date, $session, $input, $recurrance_days = false)
+    {
+        switch ((int) $session->recurrance_type) :
+                /*============================================ REPEATS WEEKLY ==================================================>*/
+        case 1:
+        $finish_date = clone $session_date;
+
+        if ($session->start_date !== $session_date->format('Y-m-d')) 
+        {
+            $finish_date->modify('-'. 1 * (int) $session->recurrance_interval.' Week');
+        }
+
+        if ($session->start_date === $finish_date->format('Y-m-d')) 
+        {
+            $session->recurrance_type = 0;
+            $session->recurrance_interval = null;
+            $session->ends_on = 0;
+        } 
+        else 
+        {
+            $session->ends_on = 2;
+        }
+
+        $session->recurrance_number = null;
+        $session->finish_date = $finish_date->format('Y-m-d');
+        // $session->save();
+        break;
+        /*============================================ REPEATS MONTHLY ==================================================>*/
+        case 2:
+        $finish_date = clone $session_date;
+
+        if ($session->start_date !== $session_date->format('Y-m-d')) 
+        {
+            $finish_date->modify('first day of this month')->modify('-'. 1 * (int) $session->recurrance_interval.' Month');
+        }
+        $recurrance_days = [1 => 'mon', 2 => 'tue', 3 => 'wed', 4 => 'thu', 5 => 'fri', 6 => 'sat', 7 => 'sun'];
+        $finish_date->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$finish_date->format('M'));
+
+        if ($session->start_date === $finish_date->format('Y-m-d')) 
+        {
+            $session->recurrance_type = 0;
+            $session->recurrance_interval = null;
+            $session->recurrance_monthly_interval = null;
+
+            $session->ends_on = 0;
+        } 
+        else 
+        {
+            $session->ends_on = 2;
+        }
+
+        $session->recurrance_number = null;
+        $session->finish_date = $finish_date->format('Y-m-d');
+        // $session->save();
+        break;
+        endswitch;
+
+        return $session;
+    }
 
 
 

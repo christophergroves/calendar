@@ -21,17 +21,16 @@ class CreateSessionsTable extends Migration
             $table->unsignedBigInteger('parent_id')->nullable();
 
             $table->unsignedInteger('session_day');
-            $table->time('start_time');
-            $table->time('finish_time');
+            $table->time('start_time')->nullable();
+            $table->time('finish_time')->nullable();
             $table->date('start_date');
-            $table->date('finish_date');
+            $table->date('finish_date')->nullable();
             $table->tinyInteger('ends_on');
             $table->tinyInteger('recurrance_type');
-            $table->tinyInteger('recurrance_interval');
-            $table->tinyInteger('recurrance_number');
+            $table->tinyInteger('recurrance_interval')->nullable();
+            $table->tinyInteger('recurrance_number')->nullable();
             $table->tinyInteger('recurrance_monthly_interval')->nullable();
             $table->unsignedInteger('hours')->nullable();
-
             $table->unsignedBigInteger('updated_by');
             $table->timestamps();
         });
