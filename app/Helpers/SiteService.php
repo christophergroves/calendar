@@ -98,70 +98,9 @@ class SiteService
             return $valid;
         });
 
-        /*=========================== Date format UK ===========================>*/
-        //extend the validator class to force dates into the format d/y/yyyy
-        Validator::extend('date_format_uk', function ($attribute, $value, $parameters) {
-            $valid = false;
-
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            if (preg_match('/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\/([1-9]|0[1-9]|1[0-2])\/[0-9]{4}$/', $value)) 
-            {
-                $date = explode('/', $value); // split the date string into its 3 parts of day, month and year.
-                if (checkdate($date[1], $date[0], $date[2])) 
-                { // is it a valid date
-                    $valid = true;
-                }
-            }
-            return $valid;
-        });
-
-        /*=========================== Date of Birth UK format ===========================>*/
-        //extend the validator class to check for date of births going in wrong
-        Validator::extend('date_of_birth_uk_format', function ($attribute, $value, $parameters) {
-            // Have to put this preg_match in as well or it will cause error when incorrect date format is put in.
-            $valid = false;
-            $valid_1 = false;
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            if (preg_match('/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\/([1-9]|0[1-9]|1[0-2])\/[0-9]{4}$/', $value)) 
-            {
-                $date = explode('/', $value); // split the date string into its 3 parts of day, month and year.
-                if (checkdate($date[1], $date[0], $date[2])) { // is it a valid date
-                    $valid_1 = true;
-                }
-            }
-            if ($valid_1) {
-                $date_of_birth = DateTime::createFromFormat('d/m/Y', $value);
-                $date_cut_off = DateTime::createFromFormat('Y-m-d', date('Y-m-d'))->modify('-15 years');
-
-                if ($date_of_birth->format('Y-m-d') < $date_cut_off->format('Y-m-d')) {
-                    $valid = true;
-                }
-            }
-
-            return $valid;
-        });
 
 
-        /*=========================== Time ==================================>*/
-        Validator::extend('time', function ($attribute, $value, $parameters) {
-            $valid = false;
-            if(strlen($value) == 0)
-            {
-                $valid = true;
-            }
-            if (preg_match('/(2[0-3]|[01][0-9]):[0-5][0-9]/', $value)) 
-            {
-                $valid = true;
-            }
 
-            return $valid;
-        });
 
         //set message for the validation rules
         $message_text = [
@@ -337,59 +276,10 @@ class SiteService
         return $include;
     }
 
-    public static function checkStaffServicePermissions($staff, $service_id)
-    {
-        $services = false;
 
-        if (is_numeric($service_id)) {
-            // Has the logged in staff member permissions to view this service?
-            if (! in_array($service_id, $staff->services)) {
-                die('<h3 style="color:red;">Logged in staff member does not have permissions to view this service!</h3>');
-            }
-            $services = [$service_id];
-        } else {
-            $services = $staff->services;
-        }
 
-        return $services;
-    }
 
-    public static function checkBrowserServerServiceUserMismatch($service_user_id_browser, $service_user_server)
-    {
-        $match = (int) $service_user_id_browser === (int) $service_user_server->id ? true : false;
 
-        if (! $match) {
-            Session::flash('message', '*Warning: Name Mismatch! Please ensure the participant name below is whom you wish to update and then try again </br>This is caused by browser page caching (please use application navigation buttons instead of browser back button) or opening multiple tabs on different names');
-            Session::flash('message_class', 'alert-warning');
-
-            DB::table('error_specific_log')
-                    ->insert([
-                        'error_details' => 'Browser/Server mismatch alert given',
-                        'date_occured' => date('Y-m-d H:i:s'),
-                        'staff_id' => Session::get('staff')->id,
-                        ]);
-        }
-
-        return $match;
-    }
-
-    public static function validateTime24hrClock($time)
-    {
-
-            // does not work
-        // if(!preg_match("/(1[012]|0[0-9]):([0-5][0-9])/", $time)){
-        // 	return false;
-        // }else{
-        // 	return $time;
-        // }
-
-        return $time;
-    }
-
-    public static function dd($output)
-    {
-        dd('<pre>'.print_r($output, 1));
-    }
 
     public static function correctNINOFormat($nino)
     {
@@ -421,17 +311,5 @@ class SiteService
         return $array;
     }
 
-    private static function clean_problem_chars($string)
-    {
-        $needles = [
-                '>',
-                '<',
-            ];
-
-        $string = strip_tags($string);
-        $string = preg_replace('~\xc2\xa0~', ' ', $string); // gets rid of problem character Â
-        $string = str_replace($needles, ' ', $string);
-
-        return $string;
-    }
+   
 }
