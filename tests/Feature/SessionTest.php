@@ -102,6 +102,8 @@ class SessionTest extends TestCase
         $response = $this->json('PUT', '/api/session/edit/store', $payload);
         $response->assertStatus(200);
 
+        // Session::truncate();
+
     }
 
 

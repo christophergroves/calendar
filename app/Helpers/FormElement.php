@@ -2,8 +2,9 @@
 
 namespace App\Helpers;
 
-use Form;
-use HTML;
+use Collective\Html\FormFacade as Form;
+use Collective\Html\HtmlFacade as HTML;
+
 
 class FormElement extends Form
 {

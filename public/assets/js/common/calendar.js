@@ -250,38 +250,21 @@ function openCalendarEditSessionDialog(calEvent, jsEvent, view, urlBase){
                 request.dataType = 'JSON';
                 request.type = 'PUT';
                
-                var formData = convertFormToJSON('#calendar_edit_form');
-                $.extend(request.data, formData);
-                sendRequest(request,null,refreshCalendar);
-
                 var dayCount = $('input[name="recurrance_day[]"]:checked').length;
                 var changedToInstance = '0';
                 var sessionDateChanged = false;
 
-
-                
-
-
-
-
-
                 if(!request.data.recurrance_type){request.data.recurrance_type = calEvent.recurrance_type;}
+
                 // Event is an instance (i.e. child of parent recurring event)
                 if(request.data.recurrance_type === '0' && calEvent.parent_id){
 
-
-
-     
-
-
-                dialog.close();
-
-                sendRequest(request,null,refreshCalendar);
-
-                return;
-
-
-                    postCalendarDialogform(urlSave, calendarID, dialog, data);
+                    request.data.action = 'edit-instance';
+                    var formData = convertFormToJSON('#calendar_edit_form');
+                    $.extend(request.data, formData);
+                    sendRequest(request,null,refreshCalendar);
+                    dialog.close();
+                
                 // Event is not an instance (i.e. not a child of recurring event)
                 }else if(recurrance_type === '0' && !calEvent.parent_id){
 
@@ -291,9 +274,16 @@ function openCalendarEditSessionDialog(calEvent, jsEvent, view, urlBase){
                         openCalendarEditChooseActionEvent(calEvent,url,data,sessionDateChanged,dayCount,changedToInstance);
                         dialog.close();
                     }else{
-                        var urlSave = url + '/calendar/edit/save/' + fp + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/edit-one-off/' + sessionDate;
+                        request.data.action = 'edit-one-off';
+                        var formData = convertFormToJSON('#calendar_edit_form');
+                        $.extend(request.data, formData);
+                        sendRequest(request,null,refreshCalendar);
                         dialog.close();
-                        postCalendarDialogform(urlSave, calendarID, dialog, data);
+
+
+                        // var urlSave = url + '/calendar/edit/save/' + fp + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/edit-one-off/' + sessionDate;
+                        // dialog.close();
+                        // postCalendarDialogform(urlSave, calendarID, dialog, data);
                     }
                 // Event used to be 'one off' but has now changed to weekly or monthly
                 }else if(calEvent.recurrance_type === '0' && (recurrance_type === '1' || recurrance_type === '2')){
@@ -319,9 +309,12 @@ function openCalendarEditSessionDialog(calEvent, jsEvent, view, urlBase){
                         dialog.close(); 
                     }else{
                         // No need to open the "openCalendarEditChooseActionEvent()" dialog because only end dates etc have changed
-                        var urlSave = url + '/calendar/edit/save/' + fp + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/edit-all/' + sessionDate;
+                        request.data.action = 'edit-all';
+                        var formData = convertFormToJSON('#calendar_edit_form');
+                        $.extend(request.data, formData);
+                        sendRequest(request,null,refreshCalendar);
                         dialog.close();
-                        postCalendarDialogform(urlSave, calendarID, dialog, data);
+                        // var urlSave = url + '/calendar/edit/save/' + fp + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/edit-all/' + sessionDate;
                     }
                 }
             }
