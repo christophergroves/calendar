@@ -439,8 +439,6 @@ public static function getMonth($user)
         if ($session_orig && (int) $session_orig->id !== (int) $session->id) {
             self::transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff);
         }
-
-        return response('success',200);
     }
 
 
@@ -668,10 +666,14 @@ public static function getMonth($user)
 /**
  * correct recurring event start and finish dates and clean up deletes
  *
- * @param Illuminate\Http\Request $request 
- * @param App\Models\User $user
- * @return Bool 
+ * @param App\Models\Session $session_orig
+ * @param Array $input
+ * @param DateTime $session_date_drag_start
+ * @param DateTime $session_date_at_drop
+ * @param String $remove_action
+ * @return void 
  */
+ 
     private static function correctStartFinishDateCleanUpDeletes($session_orig, $input, $session_date_drag_start, $session_date_at_drop = false, $remove_action = false)
     {
         $possible_delete_date = false;
@@ -901,8 +903,16 @@ public static function getMonth($user)
         return $date_correction;
     }
 
-
-    public static function transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff)
+/**
+ * transfer attendance data if new session is being created when the recurring event is changing day etc.
+ *
+ * @param App\Models\Session $session
+ * @param App\Models\Session $session_orig
+ * @param DateTime $session_date_param
+ * @param App\Models\User $user
+ * @return void 
+ */
+    public static function transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $user)
     {
         $attendances = SessionAttendance::whereSession_id($session_orig->id)->whereNotNull('absence')->get();
 
@@ -910,13 +920,21 @@ public static function getMonth($user)
             $attendance_new = $attendance->replicate();
             $attendance_new->session_deleted = null;
             $attendance_new->session_id = $session->id;
-            $attendance_new->updated_by = $staff->id;
+            $attendance_new->updated_by = $user->id;
             $attendance_new->save();
         }
     }
 
 
-
+/**
+ * If day or date is being changed on a recurring event set then finish off the existing set (correct the finish_date etc.)
+ *
+ * @param DateTime $session_date
+ * @param App\Models\Session $session
+ * @param Array $input
+ * @param Array $recurrance_days
+ * @return void 
+ */
     private static function finishOffExistingRecurringSet($session_date, $session, $input, $recurrance_days = false)
     {
         switch ((int) $session->recurrance_type) :
@@ -977,6 +995,14 @@ public static function getMonth($user)
         return $session;
     }
 
+
+/**
+ * correct the start date on a repeats weekly event if the user specifies a particular day that it should occur
+ *
+ * @param DateTime $start_date
+ * @param Integer $day_no
+ * @return DateTime actual_start_date
+ */
     private static function correctInputStartDateRepeatWeekly($start_date, $day_no)
     {
         $diff = $day_no - $start_date->format('N');
@@ -985,10 +1011,16 @@ public static function getMonth($user)
         if ($actual_start_date->format('Y-m-d') < $start_date->format('Y-m-d')) {
             $actual_start_date->modify('+1 Week');
         }
-
         return $actual_start_date;
     }
 
+/**
+ * calculate finish date of the recurring event if the user has specified the event should only run for a set number of occurances
+ *
+ * @param DateTime $actual_start_date
+ * @param Array $input
+ * @return Integer $recurrance_days
+ */
     private static function calculateFinishDateFromOccurances($actual_start_date, $input, $recurrance_days = false)
     {
         $recurrance_number = (int) $input['recurrance_number'];
@@ -1016,6 +1048,14 @@ public static function getMonth($user)
         return $finish_date->format('Y-m-d');
     }
 
+
+/**
+ * correct the finish date for a repeats weekly event
+ *
+ * @param DateTime $finish_date
+ * @param Integer $day_no
+ * @return Array $input
+ */
     private static function correctInputFinishDateRepeatWeekly($finish_date, $day_no, $input)
     {
         $diff = $day_no - $finish_date->format('N');
