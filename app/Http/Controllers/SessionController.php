@@ -81,7 +81,7 @@ class SessionController extends Controller
             break;
             /*============================================ REPEATS WEEKLY ==================================================>*/
             case 1:
-                    // CalendarService::saveRepeatWeekly($input, $session_id, $edit_action, $session_date, $staff, $service_user);
+                   CalendarService::saveRepeatWeekly($request, $user);
             break;
             /*============================================ REPEATS MONTHLY ==================================================>*/
             case 2:

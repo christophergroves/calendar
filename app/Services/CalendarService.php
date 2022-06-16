@@ -88,7 +88,6 @@ public static function getMonth($user)
         break;
         case 1:
             return true;
-        // if ((int)$row->week_diff === 0 || (int)$row->week_diff % (int)$row->recurrance_interval === 0) {$include = true;}
         break;
         case 2:
         $start_date = DateTime::createFromFormat('Y-m-d', $row->session_start_date);
@@ -334,7 +333,7 @@ public static function getMonth($user)
 
         // set 'session_deleted' flag on attendance table to flag this session on this session date is to be ommited but only if it is a recurring session.
         if (! $session->parent_id) {
-            $attendance = SessionAttendance::whereSession_id($session->id)->whereAbsence_date($request['session_date'])->first();
+            $attendance = SessionAttendance::whereSession_id($session->id)->whereAbsence_date($request['sessionDate'])->first();
             if (! $attendance) {
                 $attendance = new SessionAttendance;
             }
@@ -406,7 +405,6 @@ public static function getMonth($user)
 
     public static function saveNoRepeats($request, $user, $changed_to_instance)
     {
-        
 
         if ($request['sessionId']) {
             $session_orig = Session::select('sessions.id')
@@ -415,7 +413,6 @@ public static function getMonth($user)
             ->join('activities', 'activities.id', '=', 'sessions.activity_id')
             ->first();
 
-         
             $session_orig = Session::whereId($session_orig->id)->first();
 
             $session_orig_start_date = DateTime::createFromFormat('Y-m-d', $session_orig->start_date);
@@ -456,6 +453,161 @@ public static function getMonth($user)
 
         return response('success',200);
     }
+
+
+    public static function saveRepeatWeekly($request, $user)
+    {
+        $session_orig = false;
+        $session_date_param = DateTime::createFromFormat('Y-m-d', $request['sessionDate']);
+        $session_date_form = DateTime::createFromFormat('d/m/Y', $request['session_date']);
+        $start_date_form = DateTime::createFromFormat('d/m/Y', $request['start_date']);
+
+        // if session date on form has changed then use session_date on form to get day number and set '$request['recurrance_day'][0]' to only one value (not multiple days) * DateTime::format('N') gives you the day number
+        if ($session_date_param->format('Y-m-d') !== $session_date_form->format('Y-m-d')) 
+        {
+            $request['recurrance_day'][0] = $session_date_form->format('N');
+        // else if no day checkboxes are selected then set only day number to start_date on form
+        } 
+        elseif (! array_key_exists('recurrance_day', $request)) 
+        {
+            // $request['recurrance_day'][0] = DateTime::createFromFormat('d/m/Y', $request['start_date'])->format('N');
+            $request['recurrance_day'][0] = $start_date_form->format('N');
+        }
+
+        // if this is a new session record to be added
+        if ($request['sessionId'])
+        {
+            $session_orig = DB::table('sessions')->select('sessions.*')
+                    ->where('sessions.id', $request['sessionId'])
+                    ->whereUser_id($user->id)
+                    ->join('activities', 'activities.id', '=', 'sessions.activity_id')
+                    ->first();
+
+            $orig_start_date = DateTime::createFromFormat('Y-m-d', $session_orig->start_date);
+        }
+
+        foreach ($request['recurrance_day'] as $day_no) 
+        {
+            if ($request['sessionId']) 
+            {
+
+                // get session model
+                $session = Session::whereId($session_orig->id)->first();
+
+                // count number of days that are checked in checkbox
+                $count = count($request['recurrance_day']);
+
+                switch (true) :
+                    // is the original session day different from the checked day currently in the loop and is more that one day checked then create new session model
+                    case (int) $session->session_day !== (int) $day_no && $count > 1:
+                        $session = new Session;
+                break;
+                // if edit-now-on and session date that is clicked on calendar is different from original session start date then finnish off existing recurrance set and create new model
+                case $request['action'] === 'edit-now-on' && $orig_start_date->format('Y-m-d') !== $session_date_param->format('Y-m-d'):
+
+                $session = self::finishOffExistingRecurringSet($session_date_param, $session, $request);
+                $new_session_finish_date = DateTime::createFromFormat('Y-m-d', $session->finish_date);
+
+                $date_correction = self::correctStartFinishDateCleanUpDeletes($session, $request, $new_session_finish_date);
+
+                if ($date_correction && $date_correction['finish_date']) 
+                {
+                    $session->finish_date = $date_correction['finish_date']->format('Y-m-d');
+
+                    if ($session_orig->start_date === $date_correction['finish_date']->format('Y-m-d')) 
+                    {
+                        $session->recurrance_type = 0;
+                    }
+                }
+
+                $session->recurrance_number = null;
+                $session->ends_on = 2;
+                $session->updated_by = $staff->id;
+                $session->save();
+
+                $session = new Session;
+                break;
+                endswitch;
+            } 
+            else 
+            {
+                $session = new Session;
+            }
+
+            // set start_date (before correction) to either the session date that is clicked on calendar or the form start date field
+            if ($request['action'] === 'edit-now-on') 
+            {   // if the start date on form has changed and is after the original start date then set this as start date (as this is edit-now-on)
+                if ($start_date_form->format('Y-m-d') > $orig_start_date->format('Y-m-d')) 
+                {
+                    $start_date = DateTime::createFromFormat('d/m/Y', $request['start_date']);
+                } 
+                else 
+                {
+                    $start_date = DateTime::createFromFormat('d/m/Y', $request['session_date']);
+                }
+            } 
+            else 
+            {
+                $start_date = DateTime::createFromFormat('d/m/Y', $request['start_date']);
+            }
+
+            // correct the start date via the day number checkbox
+            $actual_start_date = self::correctInputStartDateRepeatWeekly($start_date, $day_no);
+
+
+            // switch for form 'ends on' 0:Never,1:Ends on occurances, 2:Ends on date
+            switch ($request['ends_on']) :
+                case 'ends_never':
+                    $session->finish_date = null;
+            $session->recurrance_number = null;
+            $session->ends_on = 0;
+            break;
+            case 'ends_on_occurances':
+                    if ($request['recurrance_number']) {
+                        $session->finish_date = self::calculateFinishDateFromOccurances($actual_start_date, $request);
+                        $session->recurrance_number = null;
+                        $session->ends_on = 2;
+                    } else {
+                        $session->finish_date = null;
+                        $session->recurrance_number = null;
+                        $session->ends_on = 0;
+                    }
+            break;
+            case 'ends_on_date':
+                    $actual_finish_date = null;
+            $request['finish_date'] = SiteService::setNullIfEmptyOrFalse($request['finish_date']);
+            if ($request['finish_date']) {
+                $actual_finish_date = DateTime::createFromFormat('d/m/Y', $request['finish_date']);
+                $actual_finish_date = self::correctInputFinishDateRepeatWeekly($actual_finish_date, $day_no, $request);
+            }
+            $session->finish_date = $actual_finish_date;
+            $session->recurrance_number = null;
+            $session->ends_on = $actual_finish_date ? 2 : 0;
+            break;
+            endswitch;
+
+            $session->activity_id = $request['activity_id'];
+
+            $session->start_date = $actual_start_date->format('Y-m-d');
+
+            $session->recurrance_type = $request['recurrance_type'];
+            $session->recurrance_interval = $request['recurrance_interval'];
+
+            $session->recurrance_monthly_interval = null;
+            $session->session_day = $day_no;
+            $session->start_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['start_time']));
+            $session->finish_time = SiteService::setNullIfEmptyOrFalse(SiteService::validateTime24hrClock($request['finish_time']));
+            $session->hours = $request['hours'] !== '' ? $request['hours'] : 4;
+            $session->updated_by = $user->id;
+            $session->save();
+
+            // if a new session has been created then copy the attendance over to this new session
+            if ($session_orig && (int) $session_orig->id !== (int) $session->id) {
+                self::transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff);
+            }
+        }
+    }
+
 
 
     private static function correctStartFinishDateCleanUpDeletes($session_orig, $input, $session_date_drag_start, $session_date_at_drop = false, $remove_action = false)
@@ -763,7 +915,57 @@ public static function getMonth($user)
         return $session;
     }
 
+    private static function correctInputStartDateRepeatWeekly($start_date, $day_no)
+    {
+        $diff = $day_no - $start_date->format('N');
+        $actual_start_date = clone $start_date;
+        $actual_start_date->modify($diff.' Day');
+        if ($actual_start_date->format('Y-m-d') < $start_date->format('Y-m-d')) {
+            $actual_start_date->modify('+1 Week');
+        }
 
+        return $actual_start_date;
+    }
+
+    private static function calculateFinishDateFromOccurances($actual_start_date, $input, $recurrance_days = false)
+    {
+        $recurrance_number = (int) $input['recurrance_number'];
+
+        if ($recurrance_number < 1) {
+            die('recurrance number is not a postive integer');
+        }
+
+        switch ((int) $input['recurrance_type']) :
+            /*============================================ REPEATS WEEKLY ==================================================>*/
+            case 1:
+                $finish_date = clone $actual_start_date;
+        $multiplier = (int) $input['recurrance_interval'] * ($recurrance_number - 1);
+        $finish_date->modify('+ '.($multiplier).' Week');
+        break;
+        case 2:
+                $finish_date = clone $actual_start_date;
+        $multiplier = (int) $input['recurrance_interval'] * ($recurrance_number - 1);
+        $finish_date->modify('first day of this month');
+        $finish_date->modify('+ '.($multiplier).' Month');
+        $finish_date->modify($input['recurrance_monthly_interval'].' '.$recurrance_days[$input['recurrance_day_single']].' of '.$finish_date->format('M'));
+        break;
+        endswitch;
+
+        return $finish_date->format('Y-m-d');
+    }
+
+    private static function correctInputFinishDateRepeatWeekly($finish_date, $day_no, $input)
+    {
+        $diff = $day_no - $finish_date->format('N');
+        $actual_finish_date = clone $finish_date;
+        $actual_finish_date->modify($diff.' Day');
+
+        if ($actual_finish_date->format('Y-m-d') > $finish_date->format('Y-m-d')) {
+            $actual_finish_date->modify('-'.(int) $input['recurrance_interval'].' Week');
+        }
+
+        return $actual_finish_date;
+    }
 
 
 
