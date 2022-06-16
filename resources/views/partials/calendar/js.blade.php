@@ -88,12 +88,11 @@
                         };
                         openCalendarNewSessionDialog(request,date);  
                     }
-                    
                 }
 			},
 
 			eventClick: function(calEvent, jsEvent, view) {
-                openCalendarEditChooseActionFirst(calEvent, jsEvent, view, url);
+                openCalendarEditChooseActionFirst(calEvent, jsEvent, view, urlBase);
 			},
 
 			defaultDate: new Date(),
@@ -130,10 +129,5 @@
 	});
 
 
-    function refreshCalendar(response){
-        if(response !== 'error'){
-            $('#calendar').fullCalendar( 'refetchEvents' );
-        }
-    }
-
+   
 </script>

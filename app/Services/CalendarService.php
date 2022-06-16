@@ -18,6 +18,15 @@ require_once app_path().'/Includes/constants/sql_constants.php';
 Class CalendarService
 {
 
+
+    
+    
+/**
+ * Return whole month of events for this user.
+ *
+ * @param  App\Models\User
+ * @return Array 
+ */
 public static function getMonth($user)
     {
         $events = [];
@@ -78,7 +87,12 @@ public static function getMonth($user)
     }
 
 
-
+/**
+ * perform additional checks if this row should be included if event occurs monthly.
+ *
+ * @param Array $row
+ * @return Bool $include
+ */
     private static function checkIncludeOccurance($row)
     {
         $include = false;
@@ -109,7 +123,14 @@ public static function getMonth($user)
 
 
 
-
+/**
+ * Query the db to get month of events for this user 
+ *
+ * @param DateTime $week_beginning
+ * @param DateTime $week_ending
+ * @param App\Models\User $user
+ * @return Array $allrows
+ */
     private static function getEventsQuery($week_beginning, $week_ending, $user)
     {
         $bind = [
@@ -197,6 +218,14 @@ public static function getMonth($user)
         return $allrows;
     }
 
+
+/**
+ * Calculate the difference in months for the checkIncludeOccurance function
+ *
+ * @param DateTime $start
+ * @param DateTime $end
+ * @return Integer $total_diff
+ */
     public static function diffInMonths($start, $end)
     {
         $diffYears = $end->format('Y') - $start->format('Y');
@@ -221,6 +250,12 @@ public static function getMonth($user)
 
 
 
+/**
+ * Return the list of activities for this user
+ *
+ * @param App\Models\User $user
+ * @return Array $activities
+ */
     public static function getActivitiesEditList($user)
     {
 
@@ -237,10 +272,15 @@ public static function getMonth($user)
     }
 
 
+/**
+ * Store an event which is an instance
+ * 
+ * @param Illuminate\Http\Request $request 
+ * @param App\Models\User $user
+ * @return Bool 
+ */
     public static function saveInstance($request, $user)
     {
-
-        dd('save instance');
         $day_date = false;
         $start_date_monthly = false;
 
@@ -399,13 +439,21 @@ public static function getMonth($user)
         if ($session_orig && (int) $session_orig->id !== (int) $session->id) {
             self::transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff);
         }
+
+        return response('success',200);
     }
 
 
-
+/**
+ * Store an event which is a one-off 
+ * 
+ * @param Illuminate\Http\Request $request 
+ * @param App\Models\User $user
+ * @param Bool $changed_to_instance
+ * @return Bool 
+ */
     public static function saveNoRepeats($request, $user, $changed_to_instance)
     {
-
         if ($request['sessionId']) {
             $session_orig = Session::select('sessions.id')
             ->where('sessions.id', $request['sessionId'])
@@ -451,12 +499,19 @@ public static function getMonth($user)
         $session->save();
 
 
-        return response('success',200);
+        return true;
     }
 
-
+/**
+ * Store an event which repeats weekly
+ *
+ * @param Illuminate\Http\Request $request 
+ * @param App\Models\User $user
+ * @return Bool 
+ */
     public static function saveRepeatWeekly($request, $user)
     {
+
         $session_orig = false;
         $session_date_param = DateTime::createFromFormat('Y-m-d', $request['sessionDate']);
         $session_date_form = DateTime::createFromFormat('d/m/Y', $request['session_date']);
@@ -606,10 +661,17 @@ public static function getMonth($user)
                 self::transferSessionAttendanceToNewSession($session, $session_orig, $session_date_param, $staff);
             }
         }
+        return true;
     }
 
 
-
+/**
+ * correct recurring event start and finish dates and clean up deletes
+ *
+ * @param Illuminate\Http\Request $request 
+ * @param App\Models\User $user
+ * @return Bool 
+ */
     private static function correctStartFinishDateCleanUpDeletes($session_orig, $input, $session_date_drag_start, $session_date_at_drop = false, $remove_action = false)
     {
         $possible_delete_date = false;

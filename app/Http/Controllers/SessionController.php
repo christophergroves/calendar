@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
+use stdClass;
 use App\Models\User;
 use App\Models\Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\CalendarService;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSessionRequest;
 use App\Http\Requests\UpdateSessionRequest;
-use DateTime;
-use stdClass;
 
 class SessionController extends Controller
 {
@@ -61,10 +62,6 @@ class SessionController extends Controller
         $request = $request->all();
         $user = User::where('id',$request['userId'])->firstOrFail();
 
-
-  
-
-
         if (! array_key_exists('recurrance_type', $request)) {
             $request['recurrance_type'] = 0;
         }
@@ -88,8 +85,11 @@ class SessionController extends Controller
                     // CalendarService::saveRepeatMonthly($input, $session_id, $edit_action, $session_date, $staff, $service_user);
             break;
             default:
-                    endswitch;
+            endswitch;
         }
+
+        return response('success',200);
+
     }
 
 
@@ -204,7 +204,7 @@ class SessionController extends Controller
             break;
             /*============================================ REPEATS MONTHLY ==================================================>*/
             case 2:
-                                CalendarService::saveRepeatMonthly($input, $session_id, $edit_action, $session_date, $staff, $service_user);
+                                // CalendarService::saveRepeatMonthly($input, $session_id, $edit_action, $session_date, $staff, $service_user);
             break;
             default:
                     endswitch;

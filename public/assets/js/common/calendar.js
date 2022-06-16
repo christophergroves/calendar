@@ -1,50 +1,3 @@
-function calendarGetEvents(userId, start, end, timezone, callback, urlLoadEvents){
-
-    // var urlLoadEvents = url + '/calendar/content';
-    $.ajax({
-        url: urlLoadEvents,
-        dataType: 'json',
-        tryCount:0,//current retry count
-        retryLimit:1,//number of retries on fail
-        timeout: 22000,//time before retry on fail 
-        data: {
-            start: date2mysql(start),
-            end: date2mysql(end),
-            user_id: userId,
-            
-        },
-        success: function(returnedData) {
-            callback(returnedData.events);
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            if (textStatus == 'timeout') {//if error is 'timeout'
-                this.tryCount++;
-                if (this.tryCount < this.retryLimit) {
-                        $.ajax(this);//try again
-                        return;
-                }
-                //after 3 retries to get content form server alert error message
-                // alert('Error: Timeout, please press submit again');
-            }else{
-                redirectToLogin(url);
-            }
-        }
-    });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -118,36 +71,6 @@ function postCalendarActivityDialogEdit(calEvent,url,urlSave,calendarID,dialog,d
                     //after 3 retries to get content form server alert error message
                     alert('Error: Timeout, please press submit again');
                     $('#content-replaceable').html("<h4>Error: Timeout, please press submit again<h4/>");
-                }
-                if(textStatus === 'error'){redirectToLogin(url);}
-            }
-    });
-}
-
-
-function postTransportEditDialogform(urlSave,url,dialog,data,sessionID,sessionDate,recurranceType,calendarID){
-    
-    $.ajax({
-            type: 'POST',
-            url: urlSave,
-            data: data,
-        // dataType: 'json',
-            tryCount:0,//current retry count
-            retryLimit:1,//number of retries on fail
-            timeout: 22000,//time before retry on fail
-            success: function(returnedData) {
-                $('#'+calendarID).fullCalendar( 'refetchEvents' );
-                // openTransportDetails(sessionID, url ,sessionDate,recurranceType);
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                if (textStatus == 'timeout') {//if error is 'timeout'
-                    this.tryCount++;
-                    if (this.tryCount < this.retryLimit) {
-                            $.ajax(this);//try again
-                            return;
-                    }
-                    //after 3 retries to get content form server alert error message
-                    alert('Error: Timeout, please press submit again');
                 }
                 if(textStatus === 'error'){redirectToLogin(url);}
             }
@@ -261,26 +184,43 @@ function calendarShowTooltip(data, event, view){
 
 
 
-function openCalendarEditSessionDialog(calEvent, jsEvent, view, url){
+function openCalendarEditSessionDialog(calEvent, jsEvent, view, urlBase){
 
-    var sessionDate  = date2mysql(calEvent.start);
-    
+    let request = {};
+    request.url = urlBase + '/api/session/edit/dialog/content';
+    request.dataType = 'HTML';
+    request.type = 'GET';
+    request.data = {
+        'userId': userId,
+        'sessionDate': date2mysql(calEvent.start),
+        'sessionId': calEvent.session_id,
+    };
+
     if(calEvent.recurrance_type !== '0' && !calEvent.parent_id){
-        var urlLoad = url + '/calendar/edit/dialog/content/'  + calEvent.userId + '/' + calEvent.id + '/edit-all/' + sessionDate;
+        request.data.action = 'edit-all';
     }else{
         if(!calEvent.parent_id){
-            var urlLoad = url + '/calendar/edit/dialog/content/' + calEvent.userId + '/' + calEvent.id + '/edit-one-off/' + sessionDate;
+            request.data.action = 'edit-one-off';
         }else{
-            var urlLoad = url + '/calendar/edit/dialog/content/' + calEvent.userId + '/' + calEvent.id + '/edit-instance/' + sessionDate;
+            request.data.action = 'edit-instance';
         }
     }
+    // request html to fill the form body
+    let formBody = $('<div id="allHtml"></div>');
+
+    $.ajax({
+        url: request.url,
+        dataType: request.dataType,
+        data: request.data,
+        success: function(returnedData) {
+            formBody.html(returnedData);
+        },
+    });
 
     calendarEditSessionDialog = new BootstrapDialog({
     
         title: '',
-        message: $('<div></div>').load(urlLoad,function(response,textStatus){
-                if(textStatus === 'error'){redirectToLogin(url);}
-                }),
+        message: formBody,
         draggable: true,
         closable: false,
         onshow: function(){
@@ -305,21 +245,42 @@ function openCalendarEditSessionDialog(calEvent, jsEvent, view, url){
                 //check form validation
                 $("#calendar_edit_form").bootstrapValidator('validate');
                 if(!$("#calendar_edit_form").data('bootstrapValidator').isValid()) {return false;}
-                
-                var data = $('#calendar_edit_form').serialize();
-                var calendarID = 'calendar';
-                var recurrance_type = $('#recurrance_type').val();
+
+                request.url = urlBase + '/api/session/edit/store';
+                request.dataType = 'JSON';
+                request.type = 'PUT';
+               
+                var formData = convertFormToJSON('#calendar_edit_form');
+                $.extend(request.data, formData);
+                sendRequest(request,null,refreshCalendar);
+
                 var dayCount = $('input[name="recurrance_day[]"]:checked').length;
-                var activity_id = $('#activity_id').val();
                 var changedToInstance = '0';
                 var sessionDateChanged = false;
 
-                if(!recurrance_type){recurrance_type = calEvent.recurrance_type;}
-                // Event is an instance (i.e. child of parent recurring event)
-                if(recurrance_type === '0' && calEvent.parent_id){
 
-                    var urlSave = url + '/calendar/edit/save/' + fp + '/' + viewType + '/' + calEvent.service_user_id + '/' + calEvent.id + '/edit-instance/' + sessionDate;
-                    dialog.close();
+                
+
+
+
+
+
+                if(!request.data.recurrance_type){request.data.recurrance_type = calEvent.recurrance_type;}
+                // Event is an instance (i.e. child of parent recurring event)
+                if(request.data.recurrance_type === '0' && calEvent.parent_id){
+
+
+
+     
+
+
+                dialog.close();
+
+                sendRequest(request,null,refreshCalendar);
+
+                return;
+
+
                     postCalendarDialogform(urlSave, calendarID, dialog, data);
                 // Event is not an instance (i.e. not a child of recurring event)
                 }else if(recurrance_type === '0' && !calEvent.parent_id){
@@ -429,12 +390,13 @@ function sendRequest(request,item,callback){
 
 function openCalendarNewSessionDialog(request,date){
     
+    // request html to fill the form body
     var formBody = $('<div id="allHtml"></div>');
     var url = request.url;
-    request.url = url + '/api/sessions/edit/dialog/content';
+    request.url = url + '/api/session/edit/dialog/content';
     sendRequest(request,formBody,formLoadHtml);
 
-    
+
     calendarEditSessionDialog = new BootstrapDialog({
         title: 'Create New Event',
         message: formBody, 
@@ -461,11 +423,6 @@ function openCalendarNewSessionDialog(request,date){
             //check form validation
             $("#calendar_edit_form").bootstrapValidator('validate');
             if(!$("#calendar_edit_form").data('bootstrapValidator').isValid()) {return false;}
-                
-            // var sessionDate  = date2mysql(date);
-            // var data = $('#calendar_edit_form').serialize();
-            // var calendarID = 'calendar';
-
 
             request.url = url + '/api/session/edit/store';
             request.dataType = 'JSON';
@@ -473,11 +430,8 @@ function openCalendarNewSessionDialog(request,date){
            
             var formData = convertFormToJSON('#calendar_edit_form');
             $.extend(request.data, formData);
-
             sendRequest(request,null,refreshCalendar);
-
             dialog.close();
-            // postCalendarDialogform(urlSave, calendarID, dialog, data);
             }
         },{
             label: 'Cancel',
@@ -489,8 +443,6 @@ function openCalendarNewSessionDialog(request,date){
     });
     calendarEditSessionDialog.open();
 }
-
-
 
 
 function openCalendarEditRemoveConfirm(calEvent, jsEvent, view ,url){
@@ -585,6 +537,7 @@ function openCalendarEditChooseActionFirst(calEvent, jsEvent, view, url){
             label: 'Not Attended',
             cssClass: 'btn-warning pull-left',
             action: function(dialog) {
+
 
                 var sessionDate  = date2mysql(calEvent.start);
                 var data = new Object;

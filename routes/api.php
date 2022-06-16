@@ -32,7 +32,9 @@ Route::put('/store', [ActivityController::class, 'store']);
 Route::get('/sessions/content', [SessionController::class, 'content']);
 
 
-Route::get('/sessions/edit/dialog/content', [SessionController::class, 'getEditDialogContent']);
+Route::get('/session/edit/dialog/content', [SessionController::class, 'getEditDialogContent']);
+
+
 
 
 Route::put('/session/edit/store', [SessionController::class, 'store']);
