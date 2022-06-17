@@ -411,11 +411,11 @@ public static function getMonth($user)
                 $session->save();
             }
             $session_parent = $session;
-            $session = new SessionModel;
+            $session = new Session;
         }
 
         if (! $session) {
-            $session = new SessionModel;
+            $session = new Session;
         }
         $session->fill($request); //mass fill
         if ($session_parent) {
@@ -764,7 +764,7 @@ public static function getMonth($user)
 
         if (count($possible_deletes) === count($deletes_found)) 
         {
-            $session = SessionModel::whereId($session_orig->id)->first();
+            $session = Session::whereId($session_orig->id)->first();
             $session->delete();
 
             return $date_correction;

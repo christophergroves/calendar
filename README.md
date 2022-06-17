@@ -3,6 +3,7 @@
  - A Calendar using FullCalendar javascript event calendar with PHP backend processing and MySql storage. 
  - This was built to track user participation within a time limited programme. A user agreed upon an activity (training, work placement etc.) and time spent on this activity was tracked via the calendar. 
  - This calendar is currently being separated off from a bigger project to become a standalone code example and is under heavy development, refactoring and clean up of the code base thus there are many parts that are not yet operational.
+ - User authorisation middleware yet to be implemented.
  
  
 ## Technologies Used
@@ -40,7 +41,10 @@
     ```bash
     $ php artisan db:seed
     ```
-6. You should now see a calendar at '/calendar/public/'
+6. Navigate your browser to 
+    ```bash
+    /calendar/public/
+    ```
 
 
 ## Tests

@@ -39,6 +39,7 @@ class SiteService
         return $european_date;
     }
 
+    // Old way of adding validators
     public static function validateForm($rules, $contains_array_of_elements = false, $input = false)
     {
 
@@ -206,7 +207,7 @@ class SiteService
     public static function validateTime24hrClock($time)
     {
 
-            // does not work
+        // does not work!!
         // if(!preg_match("/(1[012]|0[0-9]):([0-5][0-9])/", $time)){
         // 	return false;
         // }else{
@@ -294,7 +295,12 @@ class SiteService
 
 
 
-
+/**
+ * Corrects and formats national insurance number format 
+ *
+ * @param Str $nino
+ * @return Str $nino 
+ */
     public static function correctNINOFormat($nino)
     {
         // In case entered as referral
