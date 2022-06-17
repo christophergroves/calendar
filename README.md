@@ -1,8 +1,9 @@
-## Calendar
+# Calendar
 
  - A Calendar using FullCalendar javascript event calendar with PHP backend processing and MySql storage. 
  - This was built to track user participation within a time limited programme. A user agreed upon an activity (training, work placement etc.) and time spent on this activity was tracked via the calendar. 
  - This calendar is currently being separated off from a bigger project to become a standalone code example and is under heavy development, refactoring and clean up of the code base thus there are many parts that are not yet operational.
+ 
  
 ## Technologies Used
 
@@ -28,6 +29,7 @@
     DB_USERNAME=root
     DB_PASSWORD=
     ```
+#### Run the following commands in your terminal:
 
 4. Migrate db to your environment:
     ```bash
@@ -43,7 +45,7 @@
 
 ## Tests
 
-- A few preliminary tests have been created in SessionTest
+- A few preliminary tests have been created in SessionTest, run them with command
 
     ```bash
     $ php artisan test --filter SessionTest
