@@ -20,7 +20,7 @@
 
 1. Clone the repository from github.
 2. Create a new database in your MySQL environment.
-3. Configure Laravel to use your MySQL database via settings in .env
+3. Configure Laravel to use your MySQL database in .env
     ```
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
