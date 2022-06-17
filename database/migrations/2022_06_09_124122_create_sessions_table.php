@@ -16,7 +16,7 @@ class CreateSessionsTable extends Migration
     {
         Schema::create('sessions', function (Blueprint $table) {
     
-            $table->id();
+            $table->id()->autoIncrement();
             $table->foreignIdFor(Activity::class);
             $table->unsignedBigInteger('parent_id')->nullable();
 

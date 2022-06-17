@@ -3,19 +3,23 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\User;
 use App\Models\Session;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+
 class SessionTest extends TestCase
 {
+
     /**
-     * A basic feature test example.
-     *
+     * Store a new one off session
+     * @param Array $payload
      * @return void
      */
     public function test_new_one_off_store()
     {
+        // clear the session table first
         Session::truncate();
 
         $payload = [
@@ -40,12 +44,18 @@ class SessionTest extends TestCase
             "finish_date" => null
         ];
 
+        // store this payload successfully?
         $response = $this->json('PUT', '/api/session/edit/store', $payload);
         $response->assertStatus(200);
 
     }
 
 
+    /**
+     * Store a new weekly session with 3 occurances
+     * @param Array $payload
+     * @return void
+     */
     public function test_new_weekly_3_occurances_store()
     {
         $payload = [
@@ -75,6 +85,11 @@ class SessionTest extends TestCase
         
     }
 
+    /**
+     * Store a new weekly session with no end date
+     * @param Array $payload
+     * @return void
+     */
     public function test_new_weekly_continuous_store()
     {
         $payload = [
@@ -102,24 +117,19 @@ class SessionTest extends TestCase
         $response = $this->json('PUT', '/api/session/edit/store', $payload);
         $response->assertStatus(200);
 
-        // Session::truncate();
-
     }
 
 
 
-
-
-
-
-
-    // Route::get('/sessions/content', [SessionController::class, 'content']);
-    // Route::get('/session/edit/dialog/content', [SessionController::class, 'getEditDialogContent']);
-    // Route::put('/session/edit/store', [SessionController::class, 'store']);
-    
-    // Route::put('activity/store', [ActivityController::class, 'store']);
-
-
+    /**
+     * 3 new sessions stored?
+     * @param Array $payload
+     * @return void
+     */
+    public function test_sessions_count_stored()
+    {
+        $this->assertDatabaseCount('sessions', 3);
+    }
 
 
 

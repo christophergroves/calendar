@@ -14,7 +14,7 @@ class CreateSessionAttendancesTable extends Migration
     public function up()
     {
         Schema::create('session_attendances', function (Blueprint $table) {
-            $table->id();
+            $table->id()->autoIncrement();;
             $table->unsignedBigInteger('session_id');
             $table->tinyInteger('absence');
             $table->date('absense_date');
