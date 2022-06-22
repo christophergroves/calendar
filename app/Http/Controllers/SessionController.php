@@ -24,8 +24,9 @@ class SessionController extends Controller
      */
     public function content(Request $request)
     {
-        $user = User::where('id',$request->all()['userId'])->firstOrFail();
-        $calendar_data = CalendarService::getMonth($user);
+        $request = $request->all();
+        $user = User::where('id',$request['userId'])->firstOrFail();
+        $calendar_data = CalendarService::getMonth($user,$request);
         return $calendar_data;
     }
 

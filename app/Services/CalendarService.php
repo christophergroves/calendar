@@ -27,13 +27,13 @@ Class CalendarService
  * @param  App\Models\User
  * @return Array 
  */
-public static function getMonth($user)
+public static function getMonth($user,$request)
     {
         $events = [];
 
         if ($user) 
         {
-            $week_beginning = DateTime::createFromFormat('Y-m-d', $_GET['start']);
+            $week_beginning = DateTime::createFromFormat('Y-m-d', $request['start']);
             $week_ending = clone $week_beginning;
             $week_ending->modify('+6 Day');
 
